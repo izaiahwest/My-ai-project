@@ -12,3 +12,5 @@ Newest at the bottom. Format: date: decision (why).
 - 2026-11-15: **No captions** on edits (his call; none of his 3 reference creators use them). Replaces the 2–4-word caption rule.
 - 2026-11-15: **No top text** on edits (his call). Replaces the changing top-text rule. Scripts no longer need an on-screen top-text line.
 - 2026-11-15: **Subtle zooms only on still shots** (about 108% when nothing has moved for 3+ s), replacing "punch-in on every other cut" (his call).
+- 2026-11-15: Closest reference creator for his edits: **@dealswithkeelz** (his pick). Skit/comparison formats noted for scripts.
+- 2026-11-15: Editor built (tools/edit.py, steps in skills/editing.md). Cut points come from the audio level, not Whisper's word edges (Whisper's were off by 100+ ms in testing). Retakes: last take wins. Product pop-in waits for product images.

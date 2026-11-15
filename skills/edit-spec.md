@@ -1,4 +1,4 @@
-# Edit spec (DRAFT v0.1, not approved yet)
+# Edit spec (v0.2: style questions answered; waiting on a test edit)
 
 Built from Izaiah's 3 reference creators, top 3 videos each by views (pulled 2026-11-15):
 
@@ -50,4 +50,15 @@ Built from Izaiah's 3 reference creators, top 3 videos each by views (pulled 202
 1. ~~Captions~~ → answered: **no captions**.
 2. ~~Top text~~ → answered: **no top text**.
 3. ~~Punch-ins~~ → answered: **subtle zooms when the shot is still for 3+ s**.
-4. Which video of these 9 is closest to how you want yours to look?
+4. ~~Closest creator~~ → answered: **@dealswithkeelz**.
+
+## Closest reference: @dealswithkeelz (Izaiah, 2026-11-15)
+What that means for the edit (with his no-captions / no-top-text calls):
+- 50–56 s, about 4.2–4.9 words/sec, speech 84–91% of the runtime.
+- Loudness around -16 LUFS (we normalize to -16, peak ≤ -1.5 dBTP).
+- A cut or a new product angle about every 4–7 s. Product held close to the camera, often filling the frame.
+- Bright, clean kitchen/home setting, camera at chest height, him centered.
+- Format leans on comparisons and skits ("rich / middle class / poor boyfriend", "which one's better?"). That's a **script** choice (Part 3), not an edit setting. Noted for script writing.
+- Seen once: real photo samples popped over the frame when talking about the camera's photos. Our "show the product when he names it" rule covers the same idea.
+
+Status: style questions all answered. Next: test edit on his footage, then iterate until he says it's right.
