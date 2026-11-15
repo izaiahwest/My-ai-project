@@ -35,6 +35,7 @@ Read this whole file at the start of every session. Then read `DECISIONS.md` and
 ## Environment notes
 - This repo also runs in a **cloud container** (Claude Code on the web). The cloud copy **cannot reach Izaiah's logged-in browser** (Daily Virals, TikTok) or AirDrop. Those steps run in a Claude Code session **on his own computer** (Claude Desktop + Claude in Chrome, or `claude remote-control` in this folder). Git keeps both copies in sync.
 - Video files (raw/edits/final) are git-ignored. Only notes, scripts, sheets and code are committed.
+- On the Mac, tools live in `~/miniforge3/bin` (python, ffmpeg, ffprobe, yt-dlp). Run with `export PATH=~/miniforge3/bin:$PATH` first; `/usr/bin/python3` is the old system one without our packages.
 
 ---
 
