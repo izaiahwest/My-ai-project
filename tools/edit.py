@@ -64,7 +64,8 @@ def load_audio(path, start=0.0, dur=None):
     args = [FF, "-v", "error", "-ss", f"{start:.3f}"]
     if dur:
         args += ["-t", f"{dur:.3f}"]
-    args += ["-i", str(path), "-vn", "-ac", "1", "-ar", str(SR), "-f", "f32le", "-"]
+    # iPhone files carry a 2nd "spatial audio" (APAC) track; always use the first, normal one
+    args += ["-i", str(path), "-map", "0:a:0", "-vn", "-ac", "1", "-ar", str(SR), "-f", "f32le", "-"]
     out = subprocess.run(args, capture_output=True).stdout
     return np.frombuffer(out, dtype=np.float32)
 
@@ -106,50 +107,49 @@ def find_claps(audio, words):
 
 
 # ---------- 3. which words to keep ----------
-def lines_of(words, gap=0.45):
-    """Group words into spoken lines (pauses > gap or sentence ends)."""
-    lines, cur = [], []
-    for i, w in enumerate(words):
-        if cur and (w["s"] - cur[-1]["e"] > gap or cur[-1]["w"].endswith((".", "?", "!"))):
-            lines.append(cur)
-            cur = []
-        cur.append(w)
-    if cur:
-        lines.append(cur)
-    return lines
-
-
-def is_retake(a, b):
-    """Line a is an earlier attempt of line b (b restarts the same line)."""
-    na, nb = [norm(w["w"]) for w in a], [norm(w["w"]) for w in b]
-    na, nb = [x for x in na if x and x not in FILLERS], [x for x in nb if x and x not in FILLERS]
-    if not na or not nb:
-        return False
-    k = min(3, len(na), len(nb))
-    if na[:k] == nb[:k] and (k >= 2 or len(na) <= 2):
-        return True
-    m = min(len(na), len(nb), 8)
-    return m >= 3 and difflib.SequenceMatcher(None, na[:m], nb[:m]).ratio() >= 0.75
-
-
 def choose_words(words):
-    lines = lines_of(words)
-    drop = set()
-    for i, a in enumerate(lines):
-        for j in range(i + 1, min(i + 4, len(lines))):
-            if is_retake(a, lines[j]):
-                drop.add(i)
-                break
-    kept, dropped = [], []
-    for i, ln in enumerate(lines):
-        for k, w in enumerate(ln):
-            n = norm(w["w"])
-            stutter = k + 1 < len(ln) and n and n == norm(ln[k + 1]["w"])  # "so so"
-            if i in drop or n in FILLERS or not n or stutter:
-                dropped.append(w)
-            else:
-                kept.append(w)
-    return kept, dropped, [" ".join(w["w"] for w in lines[i]) for i in sorted(drop)]
+    """Walk the words in order. When he restarts a line (the next words repeat the start of
+    something he just said), throw away the earlier attempt: the LAST take wins.
+    He restarts mid-flow with no pause, so this works on words, not on pauses."""
+    toks = [norm(w["w"]) for w in words]
+    real = lambda x: toks[x] and toks[x] not in FILLERS
+
+    def restart_at(kept, j):
+        ahead = [toks[x] for x in range(j, min(j + 10, len(words))) if real(x)][:6]
+        if len(ahead) < 2:
+            return None
+        best = None
+        for p in range(max(0, len(kept) - 30), len(kept)):
+            prev = [toks[x] for x in kept[p:p + 6]]
+            exact = 0
+            while exact < min(len(prev), len(ahead)) and prev[exact] == ahead[exact]:
+                exact += 1
+            finished = any(words[x]["w"].endswith((".", "?", "!")) for x in kept[p:-1])
+            need = 4 if finished else 3
+            fuzzy = (not finished and exact >= 2 and len(prev) >= 4 and len(ahead) >= 4
+                     and difflib.SequenceMatcher(None, prev, ahead).ratio() >= 0.6)
+            if exact >= need or fuzzy:
+                best = p  # latest match = remove as little as possible
+        return best
+
+    kept, dropped, retakes = [], [], []
+    for j in range(len(words)):
+        if not real(j):
+            dropped.append(words[j])
+            continue
+        prev = words[kept[-1]] if kept else None
+        if (prev and toks[kept[-1]] == toks[j] and len(toks[j]) > 1   # "so so", not "...to it. It is..."
+                and not prev["w"].endswith((".", "?", "!", ",")) and words[j]["s"] - prev["e"] < 0.4):
+            dropped.append(words[j])
+            continue
+        p = restart_at(kept, j)
+        if p is not None:
+            gone = kept[p:]
+            retakes.append(" ".join(words[x]["w"] for x in gone))
+            dropped += [words[x] for x in gone]
+            kept = kept[:p]
+        kept.append(j)
+    return [words[x] for x in kept], dropped, retakes
 
 
 # ---------- 4. cut points ----------
@@ -177,7 +177,9 @@ def speech_threshold(env, t0, t1):
     """Level (linear) that separates his voice from room/car noise in this take."""
     db = 20 * np.log10(env[int(t0 * 1000):int(t1 * 1000)] + 1e-9)
     noise, speech = np.percentile(db, 10), np.percentile(db, 90)
-    return 10 ** (max(noise + 0.3 * (speech - noise), noise + 6) / 20)
+    # 0.45 of the way from noise to speech (tuned on his first real clip, 2026-11-15:
+    # 0.3 let room noise bridge the gap between a stray "bruh" and the next line)
+    return 10 ** (max(noise + 0.45 * (speech - noise), noise + 6) / 20)
 
 
 def build_pieces(words_all, kept, env, t0, dur):
@@ -213,6 +215,14 @@ def build_pieces(words_all, kept, env, t0, dur):
         else:
             hi = dur
         lo, hi = max(lo, first["s"] - 0.3, t0), min(hi, last["e"] + 0.35, dur)
+        # Whisper sometimes stretches a word over a sigh or noise ("because" lasting 1.5 s).
+        # If a word is far longer than it should be, only trust the end near the next word.
+        expect = lambda w: 0.15 + 0.085 * len(norm(w["w"]))
+        stretched_first = first["e"] - first["s"] > 1.6 * expect(first)
+        if stretched_first:
+            lo = max(lo, first["e"] - 1.3 * expect(first))
+        if last["e"] - last["s"] > 1.6 * expect(last):
+            hi = min(hi, last["s"] + 1.3 * expect(last) + POST)
         # voiced regions inside the window, split on silences > GAP
         ia, ib = int(lo * 1000), int(hi * 1000)
         voiced = env[ia:ib] > thr
@@ -228,11 +238,23 @@ def build_pieces(words_all, kept, env, t0, dur):
             else:
                 k += 1
         regions = [g for g in regions if g[1] - g[0] >= 0.04] or [(first["s"], last["e"])]
-        soft = 0.06 if SOFT_END.search(norm(last["w"])) else 0
+        if stretched_first and len(r) >= 2:
+            # Whisper's timing for that word is junk. The real word runs into the next one,
+            # so drop any separate sound (sigh, "uh", lip smack) that sits before it.
+            nxt = r[1]["s"]
+            regions = [g for g in regions if g[1] >= nxt - 0.15 or g[0] >= nxt - 0.6] or regions
+        soft = SOFT_END.search(norm(last["w"])) is not None
+        tail_thr = thr * 0.5  # about 6 dB under the speech threshold: a fading "s"/"sh"
         for n, (a, b) in enumerate(regions):
-            tail = POST + (soft if n == len(regions) - 1 else 0)
+            e = b + POST
+            if soft and n == len(regions) - 1:
+                # let a soft ending finish, but only while there's still sound
+                k = int(b * 1000)
+                while k < int((b + 0.1) * 1000) and k < len(env) and env[k] > tail_thr:
+                    k += 1
+                e = max(e, k / 1000 + 0.01)
             s = max(lo, a - PRE)
-            e = min(hi, b + tail)
+            e = min(hi, e)
             # frame grid: start rounds down, end rounds up, but never past the hard limits
             s = np.floor(s * FPS) / FPS
             if s < lo - 1e-6:
@@ -308,7 +330,7 @@ def render(src, pieces, zplan, out_path, work):
         af = f"afade=t=in:d=0.004,afade=t=out:st={max(0, d - 0.006):.3f}:d=0.006"
         p = work / f"p{i:04d}.mov"
         sh([FF, "-y", "-v", "error", "-ss", f"{s:.4f}", "-t", f"{d:.4f}", "-i", str(src),
-            "-vf", vf, "-af", af, "-ar", "48000", "-ac", "2",
+            "-map", "0:v:0", "-map", "0:a:0", "-vf", vf, "-af", af, "-ar", "48000", "-ac", "2",
             "-c:v", "libx264", "-crf", "10", "-preset", "veryfast", "-pix_fmt", "yuv420p",
             "-c:a", "pcm_s16le", str(p)])
         parts.append(p)
@@ -339,6 +361,8 @@ def qc(out_path, intended, work):
     want = [norm(w) for w in intended if norm(w)]
     sm = difflib.SequenceMatcher(None, want, got)
     rep["word_match"] = round(sm.ratio(), 3)
+    # letter-level match: "play mat" = "playmat", "Alyssa" ~ "Melissa" (Whisper re-hearing, not a cut)
+    rep["letter_match"] = round(difflib.SequenceMatcher(None, "".join(want), "".join(got), autojunk=False).ratio(), 3)
     rep["missing"] = [" ".join(want[a:b]) for op, a, b, c, d in sm.get_opcodes() if op in ("delete", "replace")][:20]
     rep["extra"] = [" ".join(got[c:d]) for op, a, b, c, d in sm.get_opcodes() if op in ("insert", "replace")][:20]
     pairs = lambda xs: {(xs[i], xs[i + 1]) for i in range(len(xs) - 1) if xs[i] == xs[i + 1]}
@@ -356,7 +380,7 @@ def qc(out_path, intended, work):
     for name, t in (("hook", 0.5), ("middle", d / 2), ("end", max(0, d - 1))):
         sh([FF, "-y", "-v", "error", "-ss", f"{t:.2f}", "-i", str(out_path), "-frames:v", "1",
             "-vf", "scale=540:-1", str(work / f"qc_{name}.jpg")])
-    rep["ok"] = (rep["word_match"] >= 0.9 and not rep["doubled"] and not rep["silences"]
+    rep["ok"] = (rep["letter_match"] >= 0.93 and not rep["doubled"] and not rep["silences"]
                  and abs(rep["lufs"] + 16) <= 1 and rep["true_peak"] <= -1.0)
     return rep
 
@@ -384,14 +408,31 @@ def edit_take(src, t0, t1, name, summary, audio, words_all):
     flag = "" if rep["ok"] else " ⚠️ **check this one**"
     summary.append(
         f"- **{name}** · {rep['duration']} s · {len(pieces)} cuts · {sum(1 for z in zplan if z)} zooms · "
-        f"{len(retakes)} retakes removed · words {rep['word_match']:.0%} · {rep['lufs']} LUFS{flag}\n"
+        f"{len(retakes)} retakes removed · words {rep['letter_match']:.0%} · {rep['lufs']} LUFS{flag}\n"
         f"  - Hook: \"{' '.join(w['w'] for w in kept[:14])}…\""
         + (f"\n  - Issues: doubled {rep['doubled']}, silences {rep['silences'][:3]}, missing {rep['missing'][:3]}"
            if not rep["ok"] else ""))
 
 
-def process(src, split, summary):
-    src = Path(src)
+def make_proxy(src):
+    """iPhone 4K/60 HEVC is slow to cut. Convert once to 1080x1920/30 (near-lossless) and edit from that."""
+    work = ROOT / "edits" / src.stem
+    work.mkdir(parents=True, exist_ok=True)
+    proxy, tmp = work / "proxy.mov", work / "proxy_tmp.mov"
+    if not proxy.exists():
+        base = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30"
+        sh([FF, "-y", "-v", "error", "-hwaccel", "videotoolbox", "-i", str(src),
+            "-map", "0:v:0", "-map", "0:a:0", "-vf", base,
+            "-c:v", "libx264", "-crf", "10", "-preset", "veryfast", "-g", "15", "-pix_fmt", "yuv420p",
+            "-c:a", "pcm_s16le", "-ar", "48000", str(tmp)])
+        tmp.rename(proxy)
+    return proxy
+
+
+def process(raw, split, summary):
+    raw = Path(raw)
+    stem = raw.stem
+    src = make_proxy(raw)
     dur = probe(src)
     spans = [(0.0, dur)]
     audio = load_audio(src)
@@ -402,7 +443,7 @@ def process(src, split, summary):
             edges = [0.0] + claps + [dur]
             spans = [(a + (0.15 if i else 0), b) for i, (a, b) in enumerate(zip(edges, edges[1:])) if b - a > 2]
     for i, (a, b) in enumerate(spans, 1):
-        name = src.stem if len(spans) == 1 else f"{src.stem}_{i:02d}"
+        name = stem if len(spans) == 1 else f"{stem}_{i:02d}"
         print(f"editing {name} ({a:.1f}-{b:.1f}s)", flush=True)
         edit_take(src, a, b, name, summary, audio, words)
 

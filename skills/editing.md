@@ -13,12 +13,13 @@ caffeinate -i python tools/edit.py raw/          # everything in raw/ not alread
 python tools/edit.py raw/IMG_1234.MOV --redo     # redo one file
 python tools/edit.py raw/IMG_1234.MOV --no-split # a file with no claps that got split wrongly
 ```
-Speed (tested 2026-11-15 on his Mac): about 3 s of processing per 1 s of raw footage. 10 minutes of raw takes about 30 minutes.
+Speed (tested 2026-11-15 on his Mac, 55 s of iPhone 4K/60 HEVC): about 1.5 min per minute of raw after a one-time proxy convert. 10 minutes of raw takes about 15–20 minutes.
 
 ## What it does (tools/edit.py)
+0. Converts the iPhone file once to a 1080×1920/30 proxy (`edits/<name>/proxy.mov`), always using the first (normal) audio track, not the spatial-audio one.
 1. Whisper (small.en) with word timestamps, once per file.
 2. Clap split: sharp, loud peaks outside speech.
-3. Picks words: drops "um/uh", stutters ("so so") and **earlier attempts of a repeated line (keeps the last take)**.
+3. Picks words: drops "um/uh", stutters ("so so", but not across a sentence break) and **earlier attempts of a repeated line (keeps the last take)**. Works word by word, because he restarts mid-flow with no pause ("because every time… because every time…").
 4. Cuts by the **audio level**, not Whisper's edges: splits on silence > 0.12 s, 20 ms before / 40 ms after (plus 60 ms on soft endings like s/sh/ly), meets dropped words at the quietest 10 ms, snaps to the 1/30 s grid without crossing into a dropped word.
 5. Subtle zoom: 108% punch-in at a cut, or a slow push-in on one long still piece, only when the picture has been still for 3+ s.
 6. Export 1080×1920, 30 fps, H.264 CRF 16, AAC 192k, -16 LUFS, limiter at -2 dBTP.
@@ -34,4 +35,6 @@ Speed (tested 2026-11-15 on his Mac): about 3 s of processing per 1 s of raw foo
 - Picking the best take by delivery (right now: last take wins).
 
 ## Known limits (from testing)
-- Tested on a generated clip only (computer voice, clap, retake, filler). Passed every QC check. **First real test on his footage is still to do.** Car noise may need the speech threshold tuned.
+- First real clip (IMG_1926, 2026-11-15): 55 s raw → 18 s final, 6 retakes removed, all QC passed. Fixes it needed: word-level retake detection; a guard for words Whisper stretches over a sigh; speech threshold raised to 0.45 between noise and speech (a stray "bruh" leaked through at 0.3).
+- QC compares **letters**, not words (Whisper re-hears "Melissa" as "Alyssa"; that's not a cut problem). Pass = 93%+.
+- Still untested: car noise, claps on real footage, zooms on real footage (this clip had constant movement, so 0 zooms).
