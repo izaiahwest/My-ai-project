@@ -41,7 +41,7 @@ Built from Izaiah's 3 reference creators, top 3 videos each by views (pulled 202
 3. Target 35–55 s.
 4. Captions: **none** (Izaiah, 2026-11-15). No word-by-word captions, same as the reference creators.
 5. Top text: **none** (Izaiah, 2026-11-15).
-6. Punch-in: **open question**. Possibly a subtle 105–110% only where there's no other movement for more than 3 s.
+6. Punch-in: **subtle zooms only when the shot is still** (Izaiah, 2026-11-15). If nothing on screen has moved for more than 3 s, punch in to about 108% at the next cut (or a slow push-in if there's no cut), then back to 100% at the cut after. Never on shots where the product is already moving or pushed to the lens.
 7. Product pop-in (image) when he names it: keep, about 1 s.
 8. Audio -16 LUFS, true peak ≤ -1.5 dBTP (matches @dealswithkeelz and @bennettfinds; @iamsk8bordb runs quiet at about -26).
 9. Export 1080×1920, 30 fps, H.264, CRF ~16, AAC.
@@ -49,5 +49,5 @@ Built from Izaiah's 3 reference creators, top 3 videos each by views (pulled 202
 ## Open questions for Izaiah (ask one at a time)
 1. ~~Captions~~ → answered: **no captions**.
 2. ~~Top text~~ → answered: **no top text**.
-3. Punch-ins: subtle zooms, or none (just move the product to the camera)?
+3. ~~Punch-ins~~ → answered: **subtle zooms when the shot is still for 3+ s**.
 4. Which video of these 9 is closest to how you want yours to look?

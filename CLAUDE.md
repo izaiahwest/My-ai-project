@@ -109,7 +109,7 @@ Read this whole file at the start of every session. Then read `DECISIONS.md` and
   - Snap every cut to the **1/30 s frame grid** for video and audio.
   - **No captions** (his call, 2026-11-15, matching his reference creators). Whisper is still used for cutting and QC.
   - **No top text** (his call, 2026-11-15).
-  - Punch-in (about 110%) on **every other cut**.
+  - **Subtle zoom (about 108%) only when the shot is still for 3+ s** (his call, 2026-11-15). No zoom when the product is moving or already at the lens. Details in `skills/edit-spec.md`.
   - When he names the product or something on screen, show it (image or close-up) for about 1 s.
   - Something new on screen **about every 3 s**.
   - Audio at **-16 LUFS**, true peak **≤ -1.5 dBTP**.
