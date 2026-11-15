@@ -39,7 +39,7 @@ Built from Izaiah's 3 reference creators, top 3 videos each by views (pulled 202
 1. Keep every CLAUDE.md cutting rule: cut all silences (gaps > 0.12 s), keep the best take, cut "um" and false starts, no cut mid-word, frame-grid cuts. This matches the 4–5 words/sec density.
 2. Start on the first word at 0.0 s.
 3. Target 35–55 s.
-4. Captions: **open question** (see below).
+4. Captions: **none** (Izaiah, 2026-11-15). No word-by-word captions, same as the reference creators.
 5. Top text: one short line for the hook, plus a section label only for comparison/skit videos.
 6. Punch-in: **open question**. Possibly a subtle 105–110% only where there's no other movement for more than 3 s.
 7. Product pop-in (image) when he names it: keep, about 1 s.
@@ -47,7 +47,7 @@ Built from Izaiah's 3 reference creators, top 3 videos each by views (pulled 202
 9. Export 1080×1920, 30 fps, H.264, CRF ~16, AAC.
 
 ## Open questions for Izaiah (ask one at a time)
-1. Captions: word-by-word captions the whole way, or no captions like these 3 creators?
+1. ~~Captions~~ → answered: **no captions**.
 2. Top text: hook line only, or none?
 3. Punch-ins: subtle zooms, or none (just move the product to the camera)?
 4. Which video of these 9 is closest to how you want yours to look?

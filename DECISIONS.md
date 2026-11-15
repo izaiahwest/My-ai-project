@@ -9,3 +9,4 @@ Newest at the bottom. Format: date: decision (why).
 - 2026-11-15: Mac setup switched from Homebrew to **Miniforge in ~/miniforge3** (no password needed; Homebrew wanted his Mac password, which blocked setup). ffmpeg, yt-dlp, Python 3.12, faster-whisper and openpyxl live there. Scripts call tools as `~/miniforge3/bin/...` (or put it first on PATH), because the shell profile isn't changed.
 - 2026-11-15: **Product research stays with ChatGPT** for now (it already does it). He shares ChatGPT's product list weekly; we use it for swipes and scripts. Claude's first focus is **editing** (biggest time sink). We take research over only if ChatGPT's list misses or costs him time.
 - 2026-11-15: Edit-style reference creators: @iamsk8bordb, @dealswithkeelz, @bennettfinds.
+- 2026-11-15: **No captions** on edits (his call; none of his 3 reference creators use them). Replaces the 2–4-word caption rule.
