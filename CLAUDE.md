@@ -102,7 +102,7 @@ Read this whole file at the start of every session. Then read `DECISIONS.md` and
 - Build the style from scratch: ask for 3–5 reference creators, study their best videos frame by frame, and write `skills/edit-spec.md` (caption font/size/color/position, words per caption, top text and when it changes, zoom/punch-in frequency, how often something new happens on screen, product pop-ins and B-roll, music and volume, length, pacing, ending). Show him the spec and a test edit on his footage, and iterate until he says it's right.
 - **Every edit, every time:**
   - Whisper with word timestamps.
-  - Cut every silence between sentences. Split on any gap between words over **0.12 s**, trim each piece by audio level with about **20 ms before / 40 ms after** the words, and start the opening instantly.
+  - Cut every silence between sentences. Split on any gap between words over **0.09 s**, trim each piece by audio level (20 ms smoothed) with about **10 ms before / 15 ms after** the words, rounding to the nearest frame (tightened 2026-11-15: he wants zero dead space, matching @dealswithkeelz), and start the opening instantly.
   - Never cut a word in half. Where a kept word meets a cut word, cut at the **quietest 10 ms** between them, and let soft endings (s, sh, ly) finish.
   - On repeated lines, keep the best take and cut the others completely, with no leftover first words.
   - Cut fluff: "um", false starts, detours.

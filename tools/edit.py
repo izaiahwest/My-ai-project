@@ -29,8 +29,8 @@ BIN = Path.home() / "miniforge3" / "bin"
 FF, FP = str(BIN / "ffmpeg"), str(BIN / "ffprobe")
 SR = 16000
 FPS = 30
-GAP = 0.12           # split on word gaps bigger than this (s)
-PRE, POST = 0.020, 0.040
+GAP = 0.09           # split on gaps bigger than this (s). Was 0.12; he wants zero dead space (2026-11-15)
+PRE, POST = 0.010, 0.015  # was 20/40 ms; tightened for zero dead space (2026-11-15)
 ZOOM = 1.08
 STILL_SECS = 3.0
 FILLERS = {"um", "uh", "umm", "uhh", "erm", "hmm", "mm", "ah"}
@@ -225,18 +225,30 @@ def build_pieces(words_all, kept, env, t0, dur):
             hi = min(hi, last["s"] + 1.3 * expect(last) + POST)
         # voiced regions inside the window, split on silences > GAP
         ia, ib = int(lo * 1000), int(hi * 1000)
-        voiced = env[ia:ib] > thr
-        regions, k = [], 0
+        # 20 ms smoothed level: single 1 ms noise spikes (rustle, breath, clicks) must not
+        # count as talking. (Unsmoothed, they chained together and kept 0.5-0.8 s pauses.)
+        sm = np.convolve(env[max(0, ia - 10):ib + 10], np.ones(20) / 20, "same")[ia - max(0, ia - 10):][: ib - ia]
+        voiced = sm > thr
+        # blobs of sound, dropping blips under 50 ms
+        blobs, k = [], 0
         while k < len(voiced):
             if voiced[k]:
                 j = k
-                while j < len(voiced) and (voiced[j] or (j + int(GAP * 1000) < len(voiced)
-                                                         and voiced[j:j + int(GAP * 1000)].any())):
+                while j < len(voiced) and voiced[j]:
                     j += 1
-                regions.append(((ia + k) / 1000, (ia + j) / 1000))
+                if j - k >= 50:
+                    blobs.append([k, j])
                 k = j
             else:
                 k += 1
+        # join blobs separated by less than GAP (normal gaps inside a sentence)
+        regions = []
+        for b in blobs:
+            if regions and b[0] - regions[-1][1] < GAP * 1000:
+                regions[-1][1] = b[1]
+            else:
+                regions.append(b)
+        regions = [((ia + a) / 1000, (ia + b) / 1000) for a, b in regions]
         regions = [g for g in regions if g[1] - g[0] >= 0.04] or [(first["s"], last["e"])]
         if stretched_first and len(r) >= 2:
             # Whisper's timing for that word is junk. The real word runs into the next one,
@@ -255,11 +267,13 @@ def build_pieces(words_all, kept, env, t0, dur):
                 e = max(e, k / 1000 + 0.01)
             s = max(lo, a - PRE)
             e = min(hi, e)
-            # frame grid: start rounds down, end rounds up, but never past the hard limits
-            s = np.floor(s * FPS) / FPS
+            # frame grid: round to the NEAREST frame (rounding outward added up to 2 frames of
+            # dead air per cut). The 20 ms smoothing already starts ~10 ms before the sound and
+            # ends ~10 ms after, so nearest-frame rounding never clips a word.
+            s = np.round(s * FPS) / FPS
             if s < lo - 1e-6:
                 s = np.ceil(lo * FPS) / FPS
-            e = np.ceil(e * FPS) / FPS
+            e = np.round(e * FPS) / FPS
             if e > hi + 1e-6:
                 e = np.floor(hi * FPS) / FPS
             s, e = float(s), float(e)

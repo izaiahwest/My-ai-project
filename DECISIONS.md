@@ -15,3 +15,4 @@ Newest at the bottom. Format: date: decision (why).
 - 2026-11-15: Closest reference creator for his edits: **@dealswithkeelz** (his pick). Skit/comparison formats noted for scripts.
 - 2026-11-15: Editor built (tools/edit.py, steps in skills/editing.md). Cut points come from the audio level, not Whisper's word edges (Whisper's were off by 100+ ms in testing). Retakes: last take wins. Product pop-in waits for product images.
 - 2026-11-15: First real edit (IMG_1926): retake detection moved to word level (he restarts with no pause), stretched-word guard, speech threshold 0.45, QC on letter match. 55 s raw → 18 s final, all checks passed.
+- 2026-11-15: **Zero dead space** (his feedback on the first edit: "no pauses between cuts"). Gap 0.12→0.09 s, padding 20/40→10/15 ms, nearest-frame rounding, 20 ms smoothed level so noise blips don't hold pauses open. IMG_1926: 18.1 s → 16.1 s; near-silence 20% → 9% (@dealswithkeelz: 10%).
