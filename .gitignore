@@ -1,0 +1,11 @@
+raw/*
+edits/*
+final/*.mp4
+final/*.mov
+*.mp4
+*.mov
+*.m4a
+*.wav
+.tmp/
+__pycache__/
+!*/.gitkeep

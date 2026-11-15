@@ -1,0 +1,6 @@
+# Decisions log
+Newest at the bottom. Format: date: decision (why).
+
+- 2026-11-15: Folder structure created (products, swipes, scripts, raw, edits, final, posted, skills, lessons, tools).
+- 2026-11-15: Video files are git-ignored; only text, sheets and code are committed (repo size, privacy).
+- 2026-11-15: The cloud session can't reach his logged-in browser. Daily Virals, TikTok and raw-footage steps run in a Claude Code session on his own computer, and git syncs the two.
