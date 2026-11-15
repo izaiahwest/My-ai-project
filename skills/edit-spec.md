@@ -40,7 +40,7 @@ Built from Izaiah's 3 reference creators, top 3 videos each by views (pulled 202
 2. Start on the first word at 0.0 s.
 3. Target 35–55 s.
 4. Captions: **none** (Izaiah, 2026-11-15). No word-by-word captions, same as the reference creators.
-5. Top text: one short line for the hook, plus a section label only for comparison/skit videos.
+5. Top text: **none** (Izaiah, 2026-11-15).
 6. Punch-in: **open question**. Possibly a subtle 105–110% only where there's no other movement for more than 3 s.
 7. Product pop-in (image) when he names it: keep, about 1 s.
 8. Audio -16 LUFS, true peak ≤ -1.5 dBTP (matches @dealswithkeelz and @bennettfinds; @iamsk8bordb runs quiet at about -26).
@@ -48,6 +48,6 @@ Built from Izaiah's 3 reference creators, top 3 videos each by views (pulled 202
 
 ## Open questions for Izaiah (ask one at a time)
 1. ~~Captions~~ → answered: **no captions**.
-2. Top text: hook line only, or none?
+2. ~~Top text~~ → answered: **no top text**.
 3. Punch-ins: subtle zooms, or none (just move the product to the camera)?
 4. Which video of these 9 is closest to how you want yours to look?

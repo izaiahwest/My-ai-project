@@ -108,7 +108,7 @@ Read this whole file at the start of every session. Then read `DECISIONS.md` and
   - Cut fluff: "um", false starts, detours.
   - Snap every cut to the **1/30 s frame grid** for video and audio.
   - **No captions** (his call, 2026-11-15, matching his reference creators). Whisper is still used for cutting and QC.
-  - Top text that changes by section: the hook first, then a new line per part, in his words.
+  - **No top text** (his call, 2026-11-15).
   - Punch-in (about 110%) on **every other cut**.
   - When he names the product or something on screen, show it (image or close-up) for about 1 s.
   - Something new on screen **about every 3 s**.
