@@ -361,6 +361,7 @@ def render(src, pieces, zplan, out_path, work):
           f":attack=1:release=50:level=false,aresample=48000")
     sh([FF, "-y", "-v", "error", "-i", str(joined), "-af", af, "-ar", "48000",
         "-c:v", "libx264", "-crf", "16", "-preset", "slow", "-pix_fmt", "yuv420p", "-r", "30",
+        "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709",
         "-movflags", "+faststart", "-c:a", "aac", "-b:a", "192k", str(out_path)])
     for p in parts:
         p.unlink()
@@ -400,6 +401,33 @@ def qc(out_path, intended, work):
 
 
 # ---------- driver ----------
+def clean_pieces(pieces, audio):
+    """1. Pieces almost touching in the source (< 0.1 s apart) become one: no 2-frame jump.
+    2. Short pieces (< 0.4 s) must contain a real word. Whisper sometimes mis-times a word
+       and leaves a scrap of a sigh or hand movement, which shows up as a flash of a
+       different moment before the real line (his feedback, 2026-11-15)."""
+    merged = []
+    for s, e in pieces:
+        if merged and s - merged[-1][1] < 0.1:
+            merged[-1][1] = e
+        else:
+            merged.append([s, e])
+    out, scraps = [], []
+    for s, e in merged:
+        if e - s < 0.4:
+            clip = audio[max(0, int((s - 0.05) * SR)):int((e + 0.05) * SR)]
+            # voice-activity check first (Whisper alone invents "Thank you." on noise)
+            segs, _ = model().transcribe(clip, word_timestamps=True, vad_filter=True,
+                                         vad_parameters=dict(min_speech_duration_ms=80))
+            got = [norm(w.word) for sg in segs for w in sg.words if w.probability >= 0.4]
+            real_words = [g for g in got if g and g not in FILLERS]
+            if not real_words or real_words in (["thank", "you"], ["you"], ["thanks"], ["bye"]):
+                scraps.append([round(s, 2), round(e, 2)])
+                continue
+        out.append((s, e))
+    return out, scraps
+
+
 def edit_take(src, t0, t1, name, summary, audio, words_all):
     work = ROOT / "edits" / name
     work.mkdir(parents=True, exist_ok=True)
@@ -410,11 +438,11 @@ def edit_take(src, t0, t1, name, summary, audio, words_all):
         summary.append(f"- **{name}**: skipped, no usable speech found.")
         return
     env = env_ms(audio)
-    pieces = build_pieces(words, kept, env, t0, t1)
+    pieces, scraps = clean_pieces(build_pieces(words, kept, env, t0, t1), audio)
     zplan = plan_zooms(src, pieces)
     (work / "plan.json").write_text(json.dumps(dict(
         source=str(src), span=[t0, t1], pieces=pieces, zooms=zplan,
-        kept=" ".join(w["w"] for w in kept), dropped_retakes=retakes,
+        kept=" ".join(w["w"] for w in kept), dropped_retakes=retakes, dropped_scraps=scraps,
         dropped_words=[w["w"] for w in dropped]), indent=1))
     render(src, pieces, zplan, out, work)
     rep = qc(out, [w["w"] for w in kept], work)
@@ -435,11 +463,24 @@ def make_proxy(src):
     proxy, tmp = work / "proxy.mov", work / "proxy_tmp.mov"
     if not proxy.exists():
         base = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30"
-        sh([FF, "-y", "-v", "error", "-hwaccel", "videotoolbox", "-i", str(src),
-            "-map", "0:v:0", "-map", "0:a:0", "-vf", base,
+        trc = sh([FP, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=color_transfer",
+                  "-of", "csv=p=0", str(src)]).stdout.strip().split(",")[0]
+        vin = src
+        if trc in ("arib-std-b67", "smpte2084"):
+            # iPhone HDR (HLG / Dolby Vision). Without proper conversion colors come out flat
+            # and washed out. Apple's own converter does the same tone-mapping the iPhone does
+            # when sharing to a non-HDR app. 4K at about 25 Mbps, then we shrink it.
+            vin = work / "sdr_tmp.mov"
+            sh(["/usr/bin/avconvert", "--source", str(src), "--preset", "Preset3840x2160",
+                "--output", str(vin), "--replace"])
+        sh([FF, "-y", "-v", "error", "-i", str(vin), "-i", str(src),
+            "-map", "0:v:0", "-map", "1:a:0", "-vf", base,
             "-c:v", "libx264", "-crf", "10", "-preset", "veryfast", "-g", "15", "-pix_fmt", "yuv420p",
-            "-c:a", "pcm_s16le", "-ar", "48000", str(tmp)])
+            "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709",
+            "-c:a", "pcm_s16le", "-ar", "48000", "-shortest", str(tmp)])
         tmp.rename(proxy)
+        if vin != src:
+            vin.unlink()
     return proxy
 
 
