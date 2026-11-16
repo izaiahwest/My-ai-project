@@ -484,10 +484,34 @@ def make_proxy(src):
     return proxy
 
 
-def process(raw, split, summary):
+JOINED = ROOT / "edits" / "joined.json"   # files that went into a joined video: skip them alone
+
+
+def joined_members():
+    return set(json.loads(JOINED.read_text())) if JOINED.exists() else set()
+
+
+def process_joined(raws, summary):
+    """Several clips -> ONE video, in the order given (he tells us which ones go together;
+    by default every clip is its own video)."""
+    raws = [Path(r) for r in raws]
+    stem = f"{raws[0].stem}+{len(raws) - 1}"
+    work = ROOT / "edits" / stem
+    work.mkdir(parents=True, exist_ok=True)
+    src = work / "proxy.mov"
+    if not src.exists():
+        proxies = [make_proxy(r) for r in raws]  # same format, so they join without re-encoding
+        lst = work / "join.txt"
+        lst.write_text("".join(f"file '{p.resolve()}'\n" for p in proxies))
+        sh([FF, "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(src)])
+    JOINED.write_text(json.dumps(sorted(joined_members() | {r.name for r in raws})))
+    process(raws[0], False, summary, src=src, stem=stem)
+
+
+def process(raw, split, summary, src=None, stem=None):
     raw = Path(raw)
-    stem = raw.stem
-    src = make_proxy(raw)
+    stem = stem or raw.stem
+    src = src or make_proxy(raw)
     dur = probe(src)
     spans = [(0.0, dur)]
     audio = load_audio(src)
@@ -508,14 +532,23 @@ def main():
     ap.add_argument("inputs", nargs="+")
     ap.add_argument("--no-split", action="store_true")
     ap.add_argument("--redo", action="store_true", help="re-edit files already in final/")
+    ap.add_argument("--join", action="store_true",
+                    help="put all the given clips together into ONE video, in the order given")
     a = ap.parse_args()
     files = []
     for x in map(Path, a.inputs):
         files += sorted(p for p in x.iterdir() if p.suffix.lower() in VIDEO_EXT) if x.is_dir() else [x]
     (ROOT / "final").mkdir(exist_ok=True)
     summary = []
+    if a.join:
+        try:
+            process_joined(files, summary)
+        except Exception as e:
+            summary.append(f"- **join {[f.name for f in files]}**: FAILED: {e}")
+        files = []
+    skip = joined_members()
     for f in files:
-        if not a.redo and any((ROOT / "final").glob(f"{f.stem}*.mp4")):
+        if not a.redo and (any((ROOT / "final").glob(f"{f.stem}*.mp4")) or f.name in skip):
             print(f"skip {f.name} (already edited)")
             continue
         try:

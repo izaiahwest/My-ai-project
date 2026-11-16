@@ -12,7 +12,9 @@ cd ~/My-ai-project && export PATH=~/miniforge3/bin:$PATH
 caffeinate -i python tools/edit.py raw/          # everything in raw/ not already in final/
 python tools/edit.py raw/IMG_1234.MOV --redo     # redo one file
 python tools/edit.py raw/IMG_1234.MOV --no-split # a file with no claps that got split wrongly
+python tools/edit.py --join raw/IMG_2001.MOV raw/IMG_2002.MOV   # several clips -> ONE video, in this order
 ```
+**Which clips go together:** by default **every clip is its own video** (still split on claps). When Izaiah says clips belong together ("2001 and 2002 are one video"), run `--join` with them in the order he gives. Joined clips are listed in `edits/joined.json` so `raw/` runs don't edit them again on their own.
 Speed (tested 2026-11-15 on his Mac, 55 s of iPhone 4K/60 HEVC): about 1.5 min per minute of raw after a one-time proxy convert. 10 minutes of raw takes about 15–20 minutes.
 
 ## What it does (tools/edit.py)
