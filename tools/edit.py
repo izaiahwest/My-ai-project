@@ -6,6 +6,8 @@ Usage (on the Mac):
     python tools/edit.py raw/IMG_1234.MOV            # one file
     python tools/edit.py raw/                         # everything in raw/ not yet edited
     python tools/edit.py raw/x.MOV --no-split         # don't split on claps
+    python tools/edit.py --join raw/a.MOV raw/b.MOV   # several clips -> one video
+    python tools/edit.py --clone raw/a.MOV raw/b.MOV [--script s.txt]   # split-screen "two of me"
 
 For each raw file:
   1. Split on claps (one clap between videos) into separate takes.
@@ -328,7 +330,8 @@ def plan_zooms(src, pieces):
 
 
 # ---------- 6. render ----------
-def render(src, pieces, zplan, out_path, work):
+def render_pieces(src, pieces, zplan, work, tag="p"):
+    """Cut the pieces out of src and join them (near-lossless). Returns the joined file."""
     parts = []
     for i, ((s, e), z) in enumerate(zip(pieces, zplan)):
         d = e - s
@@ -342,17 +345,29 @@ def render(src, pieces, zplan, out_path, work):
         else:
             vf = base
         af = f"afade=t=in:d=0.004,afade=t=out:st={max(0, d - 0.006):.3f}:d=0.006"
-        p = work / f"p{i:04d}.mov"
+        p = work / f"{tag}{i:04d}.mov"
         sh([FF, "-y", "-v", "error", "-ss", f"{s:.4f}", "-t", f"{d:.4f}", "-i", str(src),
             "-map", "0:v:0", "-map", "0:a:0", "-vf", vf, "-af", af, "-ar", "48000", "-ac", "2",
             "-c:v", "libx264", "-crf", "10", "-preset", "veryfast", "-pix_fmt", "yuv420p",
             "-c:a", "pcm_s16le", str(p)])
         parts.append(p)
-    lst = work / "parts.txt"
-    lst.write_text("".join(f"file '{p.name}'\n" for p in parts))
-    joined = work / "joined.mov"
-    sh([FF, "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(joined)])
-    # loudness: measure, apply one gain to hit -16 LUFS, then a true-peak limiter at about -2 dBTP
+    joined = work / f"{tag}_joined.mov"
+    concat(parts, joined)
+    for p in parts:
+        p.unlink()
+    return joined
+
+
+def concat(parts, out):
+    lst = out.with_suffix(".txt")
+    lst.write_text("".join(f"file '{Path(p).resolve()}'\n" for p in parts))
+    sh([FF, "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(out)])
+    lst.unlink()
+
+
+def finish(joined, out_path):
+    """Loudness: measure, apply one gain to hit -16 LUFS, then a true-peak limiter at about -2 dBTP.
+    Final encode 1080x1920/30, H.264 CRF 16, AAC 192k, bt709."""
     r = subprocess.run([FF, "-i", str(joined), "-af", "ebur128", "-vn", "-f", "null", "-"],
                        capture_output=True, text=True).stderr
     measured = float(re.findall(r"I:\s+(-?[\d.]+) LUFS", r)[-1])
@@ -363,8 +378,11 @@ def render(src, pieces, zplan, out_path, work):
         "-c:v", "libx264", "-crf", "16", "-preset", "slow", "-pix_fmt", "yuv420p", "-r", "30",
         "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709",
         "-movflags", "+faststart", "-c:a", "aac", "-b:a", "192k", str(out_path)])
-    for p in parts:
-        p.unlink()
+
+
+def render(src, pieces, zplan, out_path, work):
+    joined = render_pieces(src, pieces, zplan, work)
+    finish(joined, out_path)
     joined.unlink()
 
 
@@ -534,12 +552,23 @@ def main():
     ap.add_argument("--redo", action="store_true", help="re-edit files already in final/")
     ap.add_argument("--join", action="store_true",
                     help="put all the given clips together into ONE video, in the order given")
+    ap.add_argument("--clone", action="store_true",
+                    help="two takes from a phone that didn't move -> one split-screen 'two of me' video")
+    ap.add_argument("--script", help="(clone) text file, lines like 'A: ...' / 'B: ...' (A = first take)")
     a = ap.parse_args()
     files = []
     for x in map(Path, a.inputs):
         files += sorted(p for p in x.iterdir() if p.suffix.lower() in VIDEO_EXT) if x.is_dir() else [x]
     (ROOT / "final").mkdir(exist_ok=True)
     summary = []
+    if a.clone:
+        sys.modules.setdefault("edit", sys.modules[__name__])  # clone.py reuses this module
+        import clone
+        try:
+            clone.process_clone(files, summary, a.script)
+        except Exception as e:
+            summary.append(f"- **clone {[f.name for f in files]}**: FAILED: {e}")
+        files = []
     if a.join:
         try:
             process_joined(files, summary)

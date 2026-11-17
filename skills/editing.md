@@ -13,6 +13,7 @@ caffeinate -i python tools/edit.py raw/          # everything in raw/ not alread
 python tools/edit.py raw/IMG_1234.MOV --redo     # redo one file
 python tools/edit.py raw/IMG_1234.MOV --no-split # a file with no claps that got split wrongly
 python tools/edit.py --join raw/IMG_2001.MOV raw/IMG_2002.MOV   # several clips -> ONE video, in this order
+python tools/edit.py --clone raw/IMG_2001.MOV raw/IMG_2002.MOV [--script script.txt]   # split-screen "two of me"
 ```
 **Which clips go together:** by default **every clip is its own video** (still split on claps). When Izaiah says clips belong together ("2001 and 2002 are one video"), run `--join` with them in the order he gives. Joined clips are listed in `edits/joined.json` so `raw/` runs don't edit them again on their own.
 Speed (tested 2026-11-15 on his Mac, 55 s of iPhone 4K/60 HEVC): about 1.5 min per minute of raw after a one-time proxy convert. 10 minutes of raw takes about 15–20 minutes.
@@ -27,6 +28,18 @@ Speed (tested 2026-11-15 on his Mac, 55 s of iPhone 4K/60 HEVC): about 1.5 min p
 6. Export 1080×1920, 30 fps, H.264 CRF 16, AAC 192k, -16 LUFS, limiter at -2 dBTP.
 6b. Scrap check: pieces under 0.4 s must contain a real word (voice detector + Whisper; "Thank you." on noise is a known Whisper invention and doesn't count). Pieces under 0.1 s apart in the source are joined, so there are no 2-frame jumps.
 7. QC on every video (`edits/<name>/qc.json` + `qc_hook/middle/end.jpg`): re-transcribe and diff (≥ 90% match), no doubled words he didn't say, no silences ≥ 0.12 s at -40 dB, loudness within 1 LU of -16. Fails get "⚠️ check this one" in the summary.
+
+## Clone videos (two of him on screen, @dealswithkeelz style), `tools/clone.py`
+**How he films it** (tell him this if he asks):
+1. Phone on a stand. **Don't touch it between takes.** Same light (parked car or indoors; no sun moving across).
+2. Take 1: stand on one side, say character A's lines. After each line, leave a beat and react like you're listening.
+3. Take 2: stand on the other side, say B's lines the same way.
+4. Stand still about a second before the first line. **Stay on your side of the middle**; anything crossing it gets cut off at the seam.
+5. AirDrop both and say "clone, 2001 and 2002" (+ the script if there is one: lines like `A: ...` / `B: ...`, A = the character who talks first).
+
+**What it does:** edits each take normally (ums, retakes, audio cuts) → splits into lines (on pauses of 0.8 s+, or by matching the script) → orders them A, B, A, B (or script order; with a script, file order doesn't matter) → finds which side each take is on from where he moves → finds a seam through matching, still background (can bend around an arm) → talker from their take, the other side shows that take's quiet moments (right after their last line); too little quiet footage plays back and forth → 80 px soft blend → join, loudness, export, QC. No zooms in clone videos (they'd break the seam).
+**Extra QC** (`edits/<name>_clone/qc.json` → `clone`, plus `qc_seam.jpg` with the seam drawn in red): background difference on the seam > 12 = phone moved or light changed; motion on the seam > 25 = he crossed the middle; can't tell sides; script matched < 60%. Any of these = ⚠️.
+**Tested 2026-11-17** on fake takes only (two figures, two computer voices, one retake, files given in the wrong order, with and without script): right sides, right order, invisible seam, words 99%, 25 s to edit. **Not yet tested on his real footage.** 3-character skits (rich / middle / poor) aren't supported yet.
 
 ## After the run
 - Look at each `qc_*.jpg` and every ⚠️ item. Fix or redo before calling it done.

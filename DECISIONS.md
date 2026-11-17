@@ -18,3 +18,9 @@ Newest at the bottom. Format: date: decision (why).
 - 2026-11-15: **Zero dead space** (his feedback on the first edit: "no pauses between cuts"). Gap 0.12→0.09 s, padding 20/40→10/15 ms, nearest-frame rounding, 20 ms smoothed level so noise blips don't hold pauses open. IMG_1926: 18.1 s → 16.1 s; near-silence 20% → 9% (@dealswithkeelz: 10%).
 - 2026-11-15: His footage is iPhone HDR (Dolby Vision/HLG). It now goes through Apple's avconvert (4K, tone-mapped) before editing; without that, colors were washed out. Short scraps (< 0.4 s) must hold a real word, which fixes the "flash before the real line" he saw at the end.
 - 2026-11-15: **Combining clips:** every clip is its own video by default. When he says clips go together, we join them (`tools/edit.py --join`, in his order). He chose "just tell you" over a double clap or an album.
+
+## 2026-11-17: Clone (split-screen) videos
+- He asked for @dealswithkeelz-style "two of me" videos, fully automated. Built `tools/clone.py` (`edit.py --clone A B [--script]`).
+- Method: locked-off phone, one take per side, blended along a seam through the background. **No body cut-out/masking**: more reliable and no fuzzy edges, but he must stay on his side of the middle. Cut-out masking (for crossing over / handing products across) only if he needs it later.
+- Listening side = that take's quiet, still moments; plays back and forth if there isn't enough.
+- Tested on fake takes only; needs a real 3–4 line test from him before he relies on it.
