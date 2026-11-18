@@ -1,0 +1,13 @@
+{
+  "_how": "Copy to clone_settings.json (same folder) and change any value. Missing keys use the defaults in tools/clone.py.",
+  "split_default": 0.5,
+  "split_min": 0.35,
+  "split_max": 0.65,
+  "feather_px": 10,
+  "split_keep": 0.15,
+  "center_pull": 0.25,
+  "turn_gap_ms": 0,
+  "declick_ms": 2,
+  "crf": 14,
+  "audio_bitrate": "320k"
+}

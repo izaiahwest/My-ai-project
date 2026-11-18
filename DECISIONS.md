@@ -35,3 +35,9 @@ Newest at the bottom. Format: date: decision (why).
 - Workflow: two files per video (one per seat), alternating seats so each pair is filmed a minute apart; AirDrop a whole batch. Pairing by filming time + same shot + opposite sides, so random AirDrops are never edited.
 - Auto-edit on AirDrop turned on (launchd watcher, his OK). Finished videos also go to iCloud Drive › TikTok Edits.
 - Three-person clones: not built. Car = needs cut-out masking (back seat overlaps); home with 3 side-by-side spots = same seam method, 2 seams. After 2-person is running in volume.
+
+## 2026-11-18: Clone system v2 (his full spec)
+- **Audio drift root cause:** `-ss/-t` piece cuts: video rounded to whole frames (up to +1 frame per piece), audio exact; joining + the loudness pass made audio creep ahead (first aid kit video: audio 0.57 s short; gift video: 0.17 s). Fix: frame-number cuts with exactly 1600 samples/frame, lossless intermediates, one master timeline. Verified: 0 ms lip-sync error at 27 points (0.7-48.9 s) and 7 points.
+- **His rules now in code:** clone audio exactly as recorded (no normalize/limit/EQ/compression; only a 2 ms click guard at cuts, `declick_ms`); straight CapCut-style split, 10 px feather, default center, moves 35-65% per turn only to show a product; real listener footage (multiple real stretches before ever repeating; repeats get flagged); settings in `clone_settings.json`; QC measures lip-sync, frames, black/frozen, clipping, words, gaps, camera moved, split crossings.
+- Pacing kept at his approved back-to-back (`turn_gap_ms` 0); adjustable.
+- He doesn't need finished videos texted when we revise; delivery = iCloud Drive › TikTok Edits (+ shown in chat).

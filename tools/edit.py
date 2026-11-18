@@ -341,26 +341,48 @@ def plan_zooms(src, pieces):
 
 
 # ---------- 6. render ----------
-def render_pieces(src, pieces, zplan, work, tag="p"):
-    """Cut the pieces out of src and join them (near-lossless). Returns the joined file."""
+SPF = 48000 // FPS   # audio samples per video frame (1600 at 48 kHz / 30 fps)
+LOSSLESS = ["-c:v", "libx264", "-qp", "0", "-preset", "ultrafast", "-bf", "0", "-pix_fmt", "yuv420p",
+            "-c:a", "pcm_s16le", "-ar", "48000"]
+
+
+def cut_frames(src, k0, n, out, vf_extra="", audio=True, declick_ms=0):
+    """Frames [k0, k0+n) of a constant-30fps file, with EXACTLY the matching audio
+    (n x 1600 samples). Every piece has identical audio and video length, so joining any number
+    of pieces can't drift. (The old cut used -ss/-t: video rounded to whole frames and could gain
+    a frame per piece while audio didn't; 52 s of his clone video ended 0.57 s out of sync,
+    found 2026-11-18.)"""
+    # seek to half a frame BEFORE frame k0, so frame k0 is unambiguously the first one kept
+    seek = ["-ss", f"{(k0 - 0.5) / FPS:.6f}"] if k0 > 0 else []
+    a0 = SPF // 2 if k0 > 0 else 0
+    vf = f"trim=start_frame=0:end_frame={n},setpts=PTS-STARTPTS" + (f",{vf_extra}" if vf_extra else "")
+    args = [FF, "-y", "-v", "error", *seek, "-i", str(src), "-map", "0:v:0", "-vf", vf, "-frames:v", str(n)]
+    if audio:
+        af = f"atrim=start_sample={a0}:end_sample={a0 + n * SPF},asetpts=PTS-STARTPTS,aformat=sample_rates=48000:channel_layouts=stereo"
+        if declick_ms:
+            d = declick_ms / 1000   # a 2 ms ramp only stops the click of a hard cut; not an audible fade
+            af += f",afade=t=in:d={d},afade=t=out:st={max(0, n / FPS - d):.4f}:d={d}"
+        args += ["-map", "0:a:0", "-af", af]
+    sh(args + LOSSLESS + [str(out)])
+
+
+def render_pieces(src, pieces, zplan, work, tag="p", declick_ms=6):
+    """Cut the pieces out of src (frame-exact, lossless) and join them. Returns the joined file."""
     parts = []
     for i, ((s, e), z) in enumerate(zip(pieces, zplan)):
-        d = e - s
-        base = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30"
+        k0, k1 = int(round(s * FPS)), int(round(e * FPS))
+        n = k1 - k0
+        if n <= 0:
+            continue
         if z == 1:
-            vf = f"{base},scale=iw*{ZOOM}:ih*{ZOOM},crop=1080:1920"
-        elif z == 2:
-            # slow push-in 100% -> 108% across the piece
-            vf = (f"{base},scale=1620:2880,zoompan=z='1+{ZOOM - 1}*on/{max(1, int(d * FPS))}'"
+            vx = f"scale=iw*{ZOOM}:ih*{ZOOM},crop=1080:1920"
+        elif z == 2:  # slow push-in 100% -> 108% across the piece
+            vx = (f"scale=1620:2880,zoompan=z='1+{ZOOM - 1}*on/{max(1, n)}'"
                   f":x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30")
         else:
-            vf = base
-        af = f"afade=t=in:d=0.004,afade=t=out:st={max(0, d - 0.006):.3f}:d=0.006"
+            vx = ""
         p = work / f"{tag}{i:04d}.mov"
-        sh([FF, "-y", "-v", "error", "-ss", f"{s:.4f}", "-t", f"{d:.4f}", "-i", str(src),
-            "-map", "0:v:0", "-map", "0:a:0", "-vf", vf, "-af", af, "-ar", "48000", "-ac", "2",
-            "-c:v", "libx264", "-crf", "10", "-preset", "veryfast", "-pix_fmt", "yuv420p",
-            "-c:a", "pcm_s16le", str(p)])
+        cut_frames(src, k0, n, p, vx, declick_ms=declick_ms)
         parts.append(p)
     joined = work / f"{tag}_joined.mov"
     concat(parts, joined)
@@ -376,9 +398,17 @@ def concat(parts, out):
     lst.unlink()
 
 
-def finish(joined, out_path):
-    """Loudness: measure, apply one gain to hit -16 LUFS, then a true-peak limiter at about -2 dBTP.
-    Final encode 1080x1920/30, H.264 CRF 16, AAC 192k, bt709."""
+def finish(joined, out_path, normalize=True, crf=16, abr="192k"):
+    """Final encode 1080x1920/30, H.264, AAC, bt709.
+    normalize=True (one-person edits): one gain to hit -16 LUFS, then a true-peak limiter at
+    about -2 dBTP. normalize=False (clone videos, his rule 2026-11-18): audio exactly as recorded."""
+    if not normalize:
+        sh([FF, "-y", "-v", "error", "-i", str(joined), "-map", "0:v:0", "-map", "0:a:0",
+            "-c:v", "libx264", "-crf", str(crf), "-preset", "slow", "-pix_fmt", "yuv420p",
+            "-fps_mode", "cfr", "-r", str(FPS),
+            "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709",
+            "-movflags", "+faststart", "-c:a", "aac", "-b:a", abr, "-ar", "48000", str(out_path)])
+        return
     r = subprocess.run([FF, "-i", str(joined), "-af", "ebur128", "-vn", "-f", "null", "-"],
                        capture_output=True, text=True).stderr
     measured = float(re.findall(r"I:\s+(-?[\d.]+) LUFS", r)[-1])

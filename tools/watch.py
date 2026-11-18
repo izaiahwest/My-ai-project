@@ -101,7 +101,11 @@ def text_me(msg, video=None):
     if video:
         PICS.mkdir(parents=True, exist_ok=True)
         dst = PICS / Path(video).name
-        shutil.copy2(video, dst)
+        if Path(video).stat().st_size > 90e6:   # iMessage caps attachments at 100 MB: send a preview copy
+            E.sh([E.FF, "-y", "-v", "error", "-i", str(video), "-c:v", "libx264", "-crf", "22", "-preset", "fast",
+                  "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", str(dst)])
+        else:
+            shutil.copy2(video, dst)
         args.append(str(dst))
     r = subprocess.run(args, capture_output=True, text=True, timeout=120)
     if r.returncode:

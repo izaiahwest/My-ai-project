@@ -28,7 +28,24 @@ import numpy as np
 import edit as E
 
 LINE_GAP = 0.8      # a pause this long in a take ends a line (he leaves a beat for the other character)
-FEATHER = 80        # px (of 1080) soft blend across the seam
+
+# ---- Adjustable settings. Override any of them in clone_settings.json at the project root. ----
+SETTINGS = dict(
+    split_default=0.50,    # straight vertical split, CapCut style; 0.5 = center
+    split_min=0.35,        # how far it may move to show a product (0.40 = a 40/60 split)
+    split_max=0.65,
+    feather_px=10,         # soft edge at 1080 wide
+    split_keep=0.15,       # only move the split if the new spot is >15% better (no needless jumps)
+    center_pull=0.25,      # how strongly it prefers the center
+    turn_gap_ms=0,         # silence added between speakers (0 = his approved back-to-back pace)
+    declick_ms=2,          # 2 ms ramp at each cut: stops clicks, not an audible fade (0 = off)
+    crf=14,                # final H.264 quality (lower = better)
+    audio_bitrate="320k",
+)
+_sf = Path(__file__).resolve().parent.parent / "clone_settings.json"
+if _sf.exists():
+    SETTINGS.update(json.loads(_sf.read_text()))
+FEATHER = SETTINGS["feather_px"]
 TW, TH = 270, 480   # thumbnail size for seam / side detection
 
 
@@ -98,27 +115,43 @@ def span_frames(src, start, dur, n=16):
     return np.frombuffer(out[: k * TW * TH], np.uint8).reshape(k, TH, TW).astype(np.float32)
 
 
-def run_mask(fl, fr, path, fallback):
-    """Seam for ONE turn: goes through what's still and matching in THESE two clips. When he
-    holds the product toward the middle while talking, the seam moves over toward the other
-    side (he's sitting still there) instead of cutting the product off (IMG_1930, 2026-11-18)."""
+def choose_split(fl, fr, prev_x=None):
+    """Straight vertical split (CapCut style) for ONE turn, as a fraction of the width.
+    Cost of each column = how different the two clips look there + how much moves there.
+    Prefers the center; moves (within split_min..split_max) only when that clearly shows more,
+    e.g. a product held toward the middle. Returns (x, stats)."""
+    S = SETTINGS
     if len(fl) < 2 or len(fr) < 2:
-        return fallback, None
-    seam, st = find_seam(fl, fr)
-    write_mask(seam, path)
-    return path, st
+        return (prev_x or S["split_default"]), None
+    diff = np.abs(np.median(fl, 0) - np.median(fr, 0)).mean(0)
+    motion = (fl.std(0) + fr.std(0)).mean(0)
+    cost = np.convolve(diff + 2 * motion, np.ones(9) / 9, "same")
+    xs = np.arange(int(S["split_min"] * TW), int(S["split_max"] * TW) + 1)
+    c0 = float(np.median(cost[xs])) + 1e-6
+    score = cost[xs] / c0 + S["center_pull"] * np.abs(xs / TW - S["split_default"]) / 0.15
+    best = int(xs[np.argmin(score)])
+    x = best / TW
+    if prev_x is not None:  # keep the previous spot unless the new one is clearly better
+        ip = int(round(prev_x * TW))
+        if xs[0] <= ip <= xs[-1] and score[ip - xs[0]] <= score.min() * (1 + S["split_keep"]):
+            x = prev_x
+    ic = int(round(S["split_default"] * TW))
+    if score[ic - xs[0]] <= score.min() * (1 + S["split_keep"]):
+        x = S["split_default"]          # back to the center when the center is fine
+    ix = int(round(x * TW))
+    band = slice(max(0, ix - 3), ix + 4)
+    st = dict(split=round(x, 3), background_diff=round(float(diff[band].mean()), 1),
+              motion_on_seam=round(float(motion[band].mean()), 1))
+    return x, st
 
 
-def write_mask(seam, path, W=1080, H=1920):
-    """Gray mask: 0 = left take, 255 = right take, soft ramp across the seam."""
-    s = W / TW
-    ys = np.linspace(0, len(seam) - 1, H)
-    xs = np.interp(ys, np.arange(len(seam)), seam) * s + s / 2
-    alpha = np.clip((np.arange(W)[None, :] - xs[:, None]) / FEATHER + 0.5, 0, 1)
-    path.write_bytes(f"P5\n{W} {H}\n255\n".encode() + (alpha * 255).round().astype(np.uint8).tobytes())
+def straight_mask(x, path, W=1080, H=1920):
+    """0 = left take, 255 = right take; straight line at x (fraction), FEATHER px soft edge."""
+    col = np.clip((np.arange(W) - x * W) / max(FEATHER, 1) + 0.5, 0, 1)
+    img = np.tile((col * 255).round().astype(np.uint8), (H, 1))
+    path.write_bytes(f"P5\n{W} {H}\n255\n".encode() + img.tobytes())
 
 
-# ---------- lines ----------
 def read_script(path):
     """Lines like 'A: ...' / 'B: ...' (also L/R, left/right, or two names: first name = take 1).
     Returns [(take_index, text)]."""
@@ -185,8 +218,11 @@ def eff_s(w, t=None):
     if t is not None:
         sm = t.setdefault("_sm", 20 * np.log10(np.convolve(t["env"], np.ones(20) / 20, "same") + 1e-9))
         lvl = t.setdefault("_lvl", float(np.percentile(sm, 95)))
-        seg = sm[int(w["s"] * 1000):int(w["s"] * 1000) + 300]
-        if len(seg) and (seg > lvl - 15).mean() >= 0.4:
+        a = sm[int(w["s"] * 1000):int(w["s"] * 1000) + 300]
+        b = sm[max(0, int(w["e"] * 1000) - 300):int(w["e"] * 1000)]
+        # talking at Whisper's start and not at its end -> stretched forward ("all." 1.0 vs 0.0);
+        # otherwise stretched backward ("no" 0.77 vs 0.91, "I'm" 0.12 vs 0.93) - measured on his takes
+        if len(a) and len(b) and (a > lvl - 15).mean() > (b > lvl - 15).mean():
             return w["s"]
     return max(w["s"], w["e"] - 1.3 * expect(w))
 
@@ -395,44 +431,69 @@ def pick_listening(t, region, need):
     return s, max(e - s, 1 / E.FPS)
 
 
-# ---------- render ----------
-def composite(spk_file, spk_left, lis_src, g0, glen, dur, mask, out):
-    """Talker on their side, listener on the other, blended through the mask."""
-    if glen + 1e-3 >= dur:
-        lis = f"[1:v]fps={E.FPS},setpts=PTS-STARTPTS[lis]"
-    else:  # not enough quiet footage: play it forward then backward, repeated
-        n = max(1, round(2 * glen * E.FPS))
-        loops = math.ceil(dur / (2 * glen)) + 1
-        lis = (f"[1:v]fps={E.FPS},setpts=PTS-STARTPTS,split[f][r];[r]reverse[rv];[f][rv]concat=n=2:v=1:a=0,"
-               f"loop=loop={loops}:size={n}:start=0,setpts=N/{E.FPS}/TB[lis]")
-    L, R = ("[spk]", "[lis]") if spk_left else ("[lis]", "[spk]")
-    # Every stream re-timed to start at 0. Without this the talker's half was missing its first
-    # frame at each switch, so the bare other take (an EMPTY seat) flashed for a frame - his
-    # "pop in" (2026-11-18).
-    fc = (f"[0:v]fps={E.FPS},setpts=PTS-STARTPTS[spk];{lis};"
-          f"[2:v]fps={E.FPS},setpts=PTS-STARTPTS,format=gray[m];{R}[m]alphamerge[ra];"
-          f"{L}[ra]overlay=0:0:eof_action=repeat:format=auto,format=yuv420p[v]")
-    E.sh([E.FF, "-y", "-v", "error", "-i", str(spk_file),
-          "-ss", f"{g0:.4f}", "-t", f"{glen + 0.1:.4f}", "-i", str(lis_src),
-          "-loop", "1", "-framerate", str(E.FPS), "-i", str(mask),
-          "-filter_complex", fc, "-map", "[v]", "-map", "0:a", "-t", f"{dur:.4f}",
-          "-c:v", "libx264", "-crf", "10", "-preset", "veryfast", "-pix_fmt", "yuv420p",
-          "-c:a", "pcm_s16le", str(out)])
-
-
-def composite_together(src_l, s_l, src_r, s_r, dur, mask, out):
-    """Hook said by both at once: each side plays its own take, voices mixed, starts lined up."""
-    fc = (f"[0:v]fps={E.FPS},setpts=PTS-STARTPTS[l];[1:v]fps={E.FPS},setpts=PTS-STARTPTS[r];"
+# ---------- render (frame-exact: every clip is N frames with exactly N x 1600 audio samples) ----------
+def blend(left, right, mask, n, out, audio_file):
+    """Left/right clips (N frames each) through the straight mask; audio copied untouched."""
+    fc = (f"[0:v]setpts=PTS-STARTPTS[l];[1:v]setpts=PTS-STARTPTS[r];"
           f"[2:v]fps={E.FPS},setpts=PTS-STARTPTS,format=gray[m];"
-          f"[r][m]alphamerge[ra];[l][ra]overlay=0:0:eof_action=repeat:format=auto,format=yuv420p[v];"
-          f"[0:a][1:a]amix=inputs=2:normalize=0,afade=t=in:d=0.004,"
-          f"afade=t=out:st={max(0, dur - 0.006):.3f}:d=0.006[a]")
-    E.sh([E.FF, "-y", "-v", "error", "-ss", f"{s_l:.4f}", "-t", f"{dur + 0.1:.4f}", "-i", str(src_l),
-          "-ss", f"{s_r:.4f}", "-t", f"{dur + 0.1:.4f}", "-i", str(src_r),
-          "-loop", "1", "-framerate", str(E.FPS), "-i", str(mask),
-          "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", f"{dur:.4f}", "-ar", "48000", "-ac", "2",
-          "-c:v", "libx264", "-crf", "10", "-preset", "veryfast", "-pix_fmt", "yuv420p",
-          "-c:a", "pcm_s16le", str(out)])
+          f"[r][m]alphamerge[ra];[l][ra]overlay=0:0:eof_action=repeat:format=auto,format=yuv420p[v]")
+    E.sh([E.FF, "-y", "-v", "error", "-i", str(left), "-i", str(right),
+          "-loop", "1", "-framerate", str(E.FPS), "-i", str(mask), "-i", str(audio_file),
+          "-filter_complex", fc, "-map", "[v]", "-map", "3:a:0", "-frames:v", str(n),
+          "-c:v", "libx264", "-qp", "0", "-preset", "ultrafast", "-bf", "0", "-pix_fmt", "yuv420p",
+          "-c:a", "copy", str(out)])
+
+
+def listener_clip(src, k0, n, avail, out):
+    """N frames of the listener's real footage from frame k0. If the quiet stretch is shorter
+    than N (avail frames), it plays forward then backward - flagged in QC, never hidden."""
+    if avail >= n:
+        E.cut_frames(src, k0, n, out, audio=False)
+        return False
+    m = max(1, avail)
+    loops = math.ceil(n / (2 * m)) + 1
+    E.cut_frames(src, k0, m, out.with_suffix(".seg.mov"), audio=False)
+    E.sh([E.FF, "-y", "-v", "error", "-i", str(out.with_suffix(".seg.mov")), "-filter_complex",
+          f"[0:v]split[f][r];[r]reverse[rv];[f][rv]concat=n=2:v=1:a=0,loop=loop={loops}:size={2 * m}:start=0,"
+          f"setpts=N/{E.FPS}/TB[v]", "-map", "[v]", "-frames:v", str(n),
+          "-c:v", "libx264", "-qp", "0", "-preset", "ultrafast", "-bf", "0", "-pix_fmt", "yuv420p", str(out)])
+    out.with_suffix(".seg.mov").unlink()
+    return True
+
+
+def listener_plan(t, region, n, cuts, min_chunk=30):
+    """Real footage of the listener for n frames. First choice: one unbroken quiet stretch from
+    between his own lines (a real reaction). If none is long enough: several real quiet stretches
+    in a row, each switch placed on one of the talker's own cuts (cuts = frame offsets) so it
+    reads as a normal jump cut. Returns [(source_frame, count)], or None if the take doesn't have
+    enough quiet footage at all."""
+    fr_ = lambda x: int(round(x * E.FPS))
+    g0, glen = pick_listening(t, region, n / E.FPS)
+    if fr_(glen) >= n:
+        return [(fr_(g0), n)]
+    r0, r1 = region
+    mid = (r0 + r1) / 2
+    spans = sorted(((fr_(a), fr_(b) - fr_(a)) for a, b in t["quiet"] if fr_(b) - fr_(a) >= min_chunk),
+                   key=lambda sp: (not (r0 - 0.5 <= sp[0] / E.FPS <= r1 + 0.5), abs(sp[0] / E.FPS - mid)))
+    plan, done = [], 0
+    for k0, avail in spans:
+        left = n - done
+        if avail >= left:
+            plan.append((k0, left))
+            return plan
+        # end this stretch on a talker cut if one falls inside it (and leaves >= 1 s)
+        ok = [c - done for c in cuts if min_chunk <= c - done <= avail]
+        take = max(ok) if ok else avail
+        plan.append((k0, take))
+        done += take
+    return None
+
+
+def mix_together(lf, rf, n, out):
+    """Hook said together: both voices as recorded, added (no level changes)."""
+    E.sh([E.FF, "-y", "-v", "error", "-i", str(lf), "-i", str(rf), "-filter_complex",
+          f"[0:a][1:a]amix=inputs=2:normalize=0:duration=first,atrim=end_sample={n * E.SPF}[a]",
+          "-map", "[a]", "-c:a", "pcm_s16le", "-ar", "48000", str(out)])
 
 
 def pick_script(takes, paths):
@@ -479,9 +540,7 @@ def process_clone(raws, summary, script_path=None, together="auto", scripts=()):
     fa, fb = gray_frames(takes[0]["src"]), gray_frames(takes[1]["src"])
     side_score = person_side(fa, fb)
     left = 0 if side_score >= 0 else 1
-    seam, seam_stats = find_seam(*((fa, fb) if left == 0 else (fb, fa)))
-    mask = work / "mask.pgm"
-    write_mask(seam, mask)
+    seam, seam_stats = find_seam(*((fa, fb) if left == 0 else (fb, fa)))   # alignment check only
     runs = order_lines(takes, script)
     lines = [ln for _, lns in runs for ln in lns]
     if len(lines) < 2:
@@ -496,88 +555,153 @@ def process_clone(raws, summary, script_path=None, together="auto", scripts=()):
             summary.append(f"- **{stem}**: NOT edited, lines don't line up ({na} vs {nb}): needs the script "
                            f"(iCloud Drive › TikTok Scripts) or Claude to put them in order.")
             return "needs_order"
-    parts, plan, run_stats = [], [], []
+    S = SETTINGS
+    fr_ = lambda t: int(round(t * E.FPS))
+    gap = int(round(S["turn_gap_ms"] / 1000 * E.FPS))
+    maskp = work / "mask.pgm"
+    # ONE master timeline: every output frame maps to (take, source frame). Audio always comes
+    # from the same frames as the picture, so nothing can slide out of sync.
+    parts, plan, run_stats, timeline, looped_runs = [], [], [], [], []
+    out_k, prev_x = 0, None
     for ri, (k, lns) in enumerate(runs):
+        tl, tr, out = work / f"run{ri:02d}_L.mov", work / f"run{ri:02d}_R.mov", work / f"run{ri:02d}.mov"
         if k == "both":
             hl, hr = (lns[0], lns[1]) if left == 0 else (lns[1], lns[0])
-            sl, sr = hl["pieces"][0][0], hr["pieces"][0][0]
-            d = round(max(hl["pieces"][-1][1] - sl, hr["pieces"][-1][1] - sr) * E.FPS) / E.FPS
-            out = work / f"run{ri:02d}.mov"
-            rmask, rst = run_mask(span_frames(takes[hl["take"]]["src"], sl, d), span_frames(takes[hr["take"]]["src"], sr, d),
-                                  work / f"mask{ri:02d}.pgm", mask)
-            run_stats.append(rst)
-            composite_together(takes[hl["take"]]["src"], sl, takes[hr["take"]]["src"], sr, d, rmask, out)
-            parts.append(out)
-            plan.append(dict(talker="both", seconds=round(d, 2), lines=[ln["text"] for ln in lns]))
-            continue
-        spk, lis = takes[k], takes[1 - k]
-        pieces = [p for ln in lns for p in ln["pieces"]]
-        spk_file = E.render_pieces(spk["src"], pieces, [0] * len(pieces), work, tag=f"r{ri:02d}_")
-        d = E.probe(spk_file)
-        prev = [ln for r in runs[:ri] for ln in r[1] if ln["take"] == lis["k"]]
-        nxt = [ln for r in runs[ri + 1:] for ln in r[1] if ln["take"] == lis["k"]]
-        r0 = prev[-1]["pieces"][-1][1] + 0.1 if prev else 0.0
-        r1 = nxt[0]["pieces"][0][0] - 0.15 if nxt else lis["dur"]
-        if r1 <= r0:  # lines said out of order vs the script
-            r0, r1 = 0.0, lis["dur"]
-        g0, glen = pick_listening(lis, (r0, r1), d)
-        out = work / f"run{ri:02d}.mov"
-        f_spk, f_lis = span_frames(spk_file, 0, d), span_frames(lis["src"], g0, min(glen, d))
-        rmask, rst = run_mask(*((f_spk, f_lis) if k == left else (f_lis, f_spk)), work / f"mask{ri:02d}.pgm", mask)
+            kl, kr = fr_(hl["pieces"][0][0]), fr_(hr["pieces"][0][0])
+            n = max(fr_(hl["pieces"][-1][1]) - kl, fr_(hr["pieces"][-1][1]) - kr)
+            E.cut_frames(takes[hl["take"]]["src"], kl, n, tl, declick_ms=S["declick_ms"])
+            E.cut_frames(takes[hr["take"]]["src"], kr, n, tr, declick_ms=S["declick_ms"])
+            x, rst = choose_split(span_frames(tl, 0, n / E.FPS), span_frames(tr, 0, n / E.FPS), prev_x)
+            mix = work / f"run{ri:02d}_mix.wav"
+            mix_together(tl, tr, n, mix)
+            straight_mask(x, maskp)
+            blend(tl, tr, maskp, n, out, mix)
+            mix.unlink()
+            timeline += [(out_k, n, hl["take"], kl, "left"), (out_k, n, hr["take"], kr, "right")]
+            plan.append(dict(talker="both", start=round(out_k / E.FPS, 2), seconds=round(n / E.FPS, 2),
+                             split=x, lines=[ln["text"] for ln in lns]))
+        else:
+            spk, lis = takes[k], takes[1 - k]
+            pieces = [p for ln in lns for p in ln["pieces"]]
+            if gap and ri < len(runs) - 1:   # optional beat after each turn: his own real footage
+                pieces[-1] = (pieces[-1][0], min(spk["dur"], pieces[-1][1] + gap / E.FPS))
+            pieces = [(a, b) for a, b in pieces if fr_(b) > fr_(a)]
+            spk_file = E.render_pieces(spk["src"], pieces, [0] * len(pieces), work, tag=f"r{ri:02d}_",
+                                       declick_ms=S["declick_ms"])
+            n = sum(fr_(b) - fr_(a) for a, b in pieces)
+            prev = [ln for r in runs[:ri] for ln in r[1] if ln["take"] == lis["k"]]
+            nxt = [ln for r in runs[ri + 1:] for ln in r[1] if ln["take"] == lis["k"]]
+            r0 = prev[-1]["pieces"][-1][1] + 0.1 if prev else 0.0
+            r1 = nxt[0]["pieces"][0][0] - 0.15 if nxt else lis["dur"]
+            if r1 <= r0:  # lines said out of order vs the script
+                r0, r1 = 0.0, lis["dur"]
+            cuts, c = [], 0
+            for a, b in pieces:
+                c += fr_(b) - fr_(a)
+                cuts.append(c)
+            lp = listener_plan(lis, (r0, r1), n, cuts)
+            if lp:
+                looped = False
+                chunks = []
+                for ci, (k0, cnt) in enumerate(lp):
+                    cf = work / f"run{ri:02d}_c{ci}.mov"
+                    E.cut_frames(lis["src"], k0, cnt, cf, audio=False)
+                    chunks.append(cf)
+                E.concat(chunks, tl)
+                for cf in chunks:
+                    cf.unlink()
+                g0, glen = lp[0][0] / E.FPS, n / E.FPS
+            else:   # last resort, flagged: the take has too little quiet footage
+                g0, glen = pick_listening(lis, (r0, r1), n / E.FPS)
+                looped = listener_clip(lis["src"], fr_(g0), n, int(round(glen * E.FPS)), tl)
+                lp = [(fr_(g0), int(round(glen * E.FPS)))]
+            if looped:
+                looped_runs.append(round(out_k / E.FPS, 1))
+            spk_left = k == left
+            f_spk, f_lis = span_frames(spk_file, 0, n / E.FPS), span_frames(tl, 0, n / E.FPS)
+            x, rst = choose_split(*((f_spk, f_lis) if spk_left else (f_lis, f_spk)), prev_x)
+            straight_mask(x, maskp)
+            blend(*((spk_file, tl) if spk_left else (tl, spk_file)), maskp, n, out, spk_file)
+            spk_file.unlink()
+            o = out_k
+            for a, b in pieces:
+                timeline.append((o, fr_(b) - fr_(a), k, fr_(a), "left" if spk_left else "right"))
+                o += fr_(b) - fr_(a)
+            plan.append(dict(talker="left" if spk_left else "right", take=spk["raw"].name,
+                             start=round(out_k / E.FPS, 2), seconds=round(n / E.FPS, 2), split=x,
+                             lines=[ln["text"] for ln in lns],
+                             listening_from=[[round(a / E.FPS, 2), round(c / E.FPS, 2)] for a, c in lp],
+                             listener_repeated=looped))
+        for f in (tl, tr):
+            if f.exists():
+                f.unlink()
         run_stats.append(rst)
-        composite(spk_file, k == left, lis["src"], g0, glen, d, rmask, out)
-        spk_file.unlink()
+        prev_x = x
         parts.append(out)
-        plan.append(dict(talker="left" if k == left else "right", take=spk["raw"].name, seconds=round(d, 2),
-                         lines=[ln["text"] for ln in lns], listening_from=[round(g0, 2), round(glen, 2)],
-                         back_and_forth=glen + 1e-3 < d))
+        out_k += n
     joined = work / "joined.mov"
     E.concat(parts, joined)
     for p in parts:
         p.unlink()
+    maskp.unlink()
     out = E.ROOT / "final" / f"{stem}.mp4"
-    E.finish(joined, out)
+    E.finish(joined, out, normalize=False, crf=S["crf"], abr=S["audio_bitrate"])
     joined.unlink()
-    # a hook said together is heard once
+    # ---------- checks on the finished file ----------
     intended = [w for k, lns in runs for ln in (lns[:1] if k == "both" else lns) for w in ln["text"].split()]
-    rep = E.qc(out, intended, work)
-    seam_preview(out, seam, work)
-    warn = []
-    fl_, fr_ = (fa, fb) if left == 0 else (fb, fa)
-    empty = empty_seat_frames(out, seam, fl_, fr_)
-    if empty:
-        warn.append(f"one side shows an empty seat at {empty[:8]} s (a 'pop in')")
-    rs = [r for r in run_stats if r]
-    if rs:  # judge by the per-turn seams actually used
-        seam_stats = dict(seam_stats, background_diff=float(np.median([r["background_diff"] for r in rs])),
-                          motion_on_seam=float(max(r["motion_on_seam"] for r in rs)),
-                          per_turn=[[r["background_diff"], r["motion_on_seam"], r["seam_x"]] for r in rs])
-    if seam_stats["background_diff"] > 18:  # 13.5 on his first real car test with a clean seam (hair near it)
-        warn.append("the two takes don't line up (phone moved or the light changed); the middle may show a line")
-    if seam_stats["motion_on_seam"] > 25:
-        warn.append("something crosses the middle; an arm or product may get cut off there")
+    rep = E.qc(out, intended, work)            # words (Whisper re-listen), doubled words, silences, frames
+    tech = file_checks(out, out_k)
+    sync = sync_check(out, timeline, takes)
+    preview_split(out, plan, work)
+    warn, review = [], []
+    if tech["problems"]:
+        warn += tech["problems"]
+    if sync["checked"] == 0:
+        warn.append("lip-sync could not be measured")
+    elif not sync["ok"]:
+        warn.append(f"lip-sync off by up to {sync['worst_ms']} ms at {sync['worst_at']} s")
+    if rep["letter_match"] < 0.93 or rep["doubled"]:
+        warn.append(f"words: {rep['letter_match']:.0%} match, missing {rep['missing'][:3]}, doubled {rep['doubled']}")
+    if rep["silences"]:
+        review.append(f"quiet gaps over 0.12 s at {[round(a, 1) for a, _ in rep['silences'][:5]]} s")
+    align = edge_match(fa, fb)   # fixed lines (ceiling, walls, headrests): ~0.85-0.9 when the phone didn't move
+    if align < 0.6:
+        warn.append(f"the camera seems to have moved between takes (edge match {align:.2f}); the split may show")
+    crossing = [pl["start"] for pl, r in zip(plan, run_stats) if r and r["motion_on_seam"] > 25]
+    if crossing:
+        review.append(f"something crosses the split (product/arm may be cut) at {crossing} s")
+    if looped_runs:
+        review.append(f"not enough real listening footage; the listener plays back and forth at {looped_runs} s")
     if abs(side_score) < 0.5:
         warn.append("couldn't tell which side each take is on; used the file order (first = left)")
     if script and min(t["script_match"] or 0 for t in takes) < 0.6:
         warn.append(f"lines only partly matched the script ({[round(t['script_match'] or 0, 2) for t in takes]})")
-    rep["clone"] = dict(left=raws[left].name, right=raws[1 - left].name, seam=seam_stats,
-                        side_score=round(side_score, 2), warnings=warn)
-    rep["ok"] = rep["ok"] and not warn
+    xs = [pl["split"] for pl in plan]
+    fl_, fr2 = (fa, fb) if left == 0 else (fb, fa)
+    empty = empty_seat_frames(out, np.array([min(xs) * TW - FEATHER / 4, max(xs) * TW + FEATHER / 4]), fl_, fr2)
+    if empty:
+        warn.append(f"one side shows an empty spot (other take's background) at {empty[:8]} s")
+    lv = speech_levels(out, timeline, left)
+    if lv and abs(lv["left_db"] - lv["right_db"]) > 6:
+        review.append(f"one side is {abs(lv['left_db'] - lv['right_db']):.0f} dB louder (as recorded; nothing was changed)")
+    ok = not warn
+    rep.update(clone=dict(left=raws[left].name, right=raws[1 - left].name, side_score=round(side_score, 2),
+                          splits=[pl["split"] for pl in plan], levels=lv),
+               tech=tech, sync=sync, warnings=warn, review=review, ok=ok)
     (work / "plan.json").write_text(json.dumps(dict(
-        takes=[r.name for r in raws], left=raws[left].name, seam=seam_stats, runs=plan,
-        retakes=[t["retakes"] for t in takes],
-        trim_db=[[ln.get("trim_db") for ln in t["lines"]] for t in takes], empty_seat_frames=empty), indent=1))
-    (work / "qc.json").write_text(json.dumps(rep, indent=1))
+        takes=[r.name for r in raws], left=raws[left].name, settings=SETTINGS, runs=plan,
+        retakes=[t["retakes"] for t in takes], timeline=timeline,
+        trim_db=[[ln.get("trim_db") for ln in t["lines"]] for t in takes]), indent=1, default=str))
+    (work / "qc.json").write_text(json.dumps(rep, indent=1, default=str))
     E.JOINED.parent.mkdir(exist_ok=True)
     E.JOINED.write_text(json.dumps(sorted(E.joined_members() | {r.name for r in raws})))
-    flag = "" if rep["ok"] else " ⚠️ **check this one**"
+    flag = "" if ok else " ⚠️ **check this one**"
     summary.append(
-        f"- **{stem}** (clone: {raws[left].name} left, {raws[1 - left].name} right) · {rep['duration']} s · "
-        f"{len(lines)} lines · {sum(len(t['retakes']) for t in takes)} retakes removed · "
-        f"words {rep['letter_match']:.0%} · {rep['lufs']} LUFS{flag}"
-        + (f"\n  - Issues: {'; '.join(warn)}" if warn else "")
-        + (f"\n  - QC: doubled {rep['doubled']}, silences {rep['silences'][:3]}, missing {rep['missing'][:3]}"
-           if not (rep["letter_match"] >= 0.93 and not rep["doubled"] and not rep["silences"]) else ""))
+        f"- **{stem}** (clone: {raws[left].name} left, {raws[1 - left].name} right) · {tech['duration']} s · "
+        f"{len(lines)} lines · {sum(len(t['retakes']) for t in takes)} retakes removed · words {rep['letter_match']:.0%} · "
+        f"lip-sync {'✓' if sync['ok'] else '✗'} (worst {sync['worst_ms']} ms over {sync['checked']} points){flag}"
+        + (f"\n  - Problems: {'; '.join(warn)}" if warn else "")
+        + (f"\n  - Look at: {'; '.join(review)}" if review else ""))
     return "ok"
 
 
@@ -671,21 +795,131 @@ def pair_takes(files):
     return pairs, left
 
 
-def seam_preview(out, seam, work):
-    """qc_seam.jpg: middle frame with the seam drawn in red, for checking by eye."""
-    d = E.probe(out)
-    raw = subprocess.run([E.FF, "-v", "error", "-ss", f"{d / 2:.2f}", "-i", str(out), "-frames:v", "1",
-                          "-vf", "scale=540:960", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
-                         capture_output=True).stdout
-    img = np.frombuffer(raw, np.uint8).reshape(960, 540, 3).copy()
-    ys = np.linspace(0, len(seam) - 1, 960)
-    xs = (np.interp(ys, np.arange(len(seam)), seam) * 540 / TW).astype(int)
-    for y, x in enumerate(xs):
-        img[y, max(0, x - 1):x + 2] = (255, 0, 0)
-    ppm = work / "qc_seam.ppm"
-    ppm.write_bytes(b"P6\n540 960\n255\n" + img.tobytes())
-    E.sh([E.FF, "-y", "-v", "error", "-i", str(ppm), str(work / "qc_seam.jpg")])
-    ppm.unlink()
+def file_checks(out, frames):
+    """Container/stream checks: size, frame rate, frame count, A/V length, black/frozen frames, clipping."""
+    info = json.loads(E.sh([E.FP, "-v", "error", "-show_entries",
+                            "stream=codec_type,codec_name,width,height,r_frame_rate,avg_frame_rate,nb_frames,duration,sample_rate",
+                            "-of", "json", str(out)]).stdout)["streams"]
+    v = next(x for x in info if x["codec_type"] == "video")
+    a = next(x for x in info if x["codec_type"] == "audio")
+    vd, ad = float(v["duration"]), float(a["duration"])
+    probs = []
+    if (v["width"], v["height"]) != (1080, 1920):
+        probs.append(f"size {v['width']}x{v['height']}")
+    if v["r_frame_rate"] != f"{E.FPS}/1" or v["avg_frame_rate"] != f"{E.FPS}/1":
+        probs.append(f"frame rate {v['avg_frame_rate']}")
+    if int(v["nb_frames"]) != frames:
+        probs.append(f"{v['nb_frames']} frames, timeline has {frames}")
+    if abs(vd - ad) > 1.5 / E.FPS:   # AAC adds ~21 ms of padding at the end; more than that = wrong
+        probs.append(f"audio {ad:.3f} s vs video {vd:.3f} s")
+    err = subprocess.run([E.FF, "-v", "info", "-i", str(out), "-vf",
+                          "blackdetect=d=0.1:pix_th=0.05,freezedetect=n=0.0008:d=0.4", "-af", "volumedetect",
+                          "-f", "null", "-"], capture_output=True, text=True).stderr
+    black = re.findall(r"black_start:([\d.]+)", err)
+    frozen = re.findall(r"freeze_start: ([\d.]+)", err)
+    peak = float((re.findall(r"max_volume: (-?[\d.]+) dB", err) or ["-99"])[-1])
+    if black:
+        probs.append(f"black frames at {black[:5]} s")
+    if frozen:
+        probs.append(f"frozen picture at {frozen[:5]} s")
+    if peak >= -0.1:
+        probs.append(f"audio hits 0 dBFS (possible clipping), peak {peak} dB")
+    return dict(duration=round(vd, 2), audio_duration=round(ad, 3), frames=int(v["nb_frames"]),
+                fps=v["avg_frame_rate"], size=f"{v['width']}x{v['height']}", peak_db=peak,
+                black=black, frozen=frozen, problems=probs)
+
+
+def _gray(src, k, count, side, W=135, H=240):
+    """Gray thumbnails of frames k..k+count-1, only the talker's outer 35% (away from the split)."""
+    seek = ["-ss", f"{(k - 0.5) / E.FPS:.6f}"] if k > 0 else []
+    # setpts: without it a seeked batch repeats its first frame (made the check read 1 frame late)
+    raw = subprocess.run([E.FF, "-v", "error", *seek, "-i", str(src), "-frames:v", str(count),
+                          "-vf", f"setpts=PTS-STARTPTS,scale={W}:{H},format=gray", "-fps_mode", "passthrough",
+                          "-f", "rawvideo", "-"], capture_output=True).stdout
+    f = np.frombuffer(raw[: (len(raw) // (W * H)) * W * H], np.uint8).reshape(-1, H, W).astype(np.float32)
+    c = int(W * 0.35)
+    return f[:, :, :c] if side == "left" else f[:, :, W - c:]
+
+
+def sync_check(out, timeline, takes, max_points=36):
+    """Lip-sync measured, not assumed. At points spread over the whole video (start, middle and
+    end, every turn), find (1) which source frame the talker's picture really is, and (2) where
+    the audio really comes from (cross-correlation with the original recording). Both should
+    point at the same moment. Reports the worst gap in ms; pass = within one frame (33 ms)."""
+    segs = [t for t in timeline if t[1] >= 10]
+    if not segs:
+        return dict(ok=False, checked=0, worst_ms=None, worst_at=None, points=[])
+    pick = sorted(set(np.linspace(0, len(segs) - 1, min(max_points, len(segs))).round().astype(int)))
+    out_audio = E.load_audio(out)
+    pts = []
+    for i in pick:
+        o0, n, take, k0, side = segs[i]
+        m = n // 2
+        o, k = o0 + m, k0 + m
+        # picture: best-matching source frame within +-4 frames
+        ov = _gray(out, o, 1, side)
+        sv = _gray(takes[take]["src"], max(0, k - 4), 9, side)
+        if len(ov) == 0 or len(sv) == 0:
+            continue
+        vlag = int(np.argmin(np.abs(sv - ov[0]).mean((1, 2)))) - (4 if k >= 4 else k)
+        # audio: cross-correlate 0.5 s of output with the original +-0.15 s
+        sr = E.SR
+        a = out_audio[int((o / E.FPS - 0.25) * sr):int((o / E.FPS + 0.25) * sr)]
+        src_a = takes[take]["audio"]
+        b0 = int((k / E.FPS - 0.25 - 0.15) * sr)
+        b = src_a[max(0, b0):int((k / E.FPS + 0.25 + 0.15) * sr)]
+        if len(a) < sr * 0.4 or len(b) < len(a) or np.std(a) < 1e-4:
+            continue
+        a = (a - a.mean()) / (a.std() + 1e-9)
+        c = np.correlate(b - b.mean(), a, "valid")
+        lag_i = int(np.argmax(c))
+        peak = float(c[lag_i] / (np.sqrt(np.convolve((b - b.mean()) ** 2, np.ones(len(a)), "valid")[lag_i]) * np.sqrt(len(a)) + 1e-9))
+        if peak < 0.6:
+            continue  # too quiet / too noisy to measure here
+        alag_ms = ((max(0, b0) + lag_i) / sr - (k / E.FPS - 0.25)) * 1000
+        vlag_ms = vlag * 1000 / E.FPS
+        pts.append(dict(t=round(o / E.FPS, 2), video_ms=round(vlag_ms), audio_ms=round(alag_ms), gap_ms=round(alag_ms - vlag_ms)))
+    if not pts:
+        return dict(ok=False, checked=0, worst_ms=None, worst_at=None, points=[])
+    worst = max(pts, key=lambda p: abs(p["gap_ms"]))
+    return dict(ok=abs(worst["gap_ms"]) <= 1000 / E.FPS + 1, checked=len(pts), worst_ms=abs(worst["gap_ms"]),
+                worst_at=worst["t"], points=pts)
+
+
+def speech_levels(out, timeline, left):
+    """Average speech level (dBFS) of each side in the finished file - reported, never changed."""
+    a = E.load_audio(out)
+    lv = {"left": [], "right": []}
+    for o0, n, take, k0, side in timeline:
+        seg = a[int(o0 / E.FPS * E.SR):int((o0 + n) / E.FPS * E.SR)]
+        if len(seg):
+            lv[side].append(float(np.percentile(np.abs(seg), 95)))
+    if not lv["left"] or not lv["right"]:
+        return None
+    db = lambda xs: round(20 * np.log10(np.median(xs) + 1e-9), 1)
+    return dict(left_db=db(lv["left"]), right_db=db(lv["right"]))
+
+
+def preview_split(out, plan, work):
+    """qc_split.jpg: a frame from the middle of every turn with the split drawn in red."""
+    tiles = []
+    for i, pl in enumerate(plan[:12]):
+        t = pl["start"] + pl["seconds"] / 2
+        raw = subprocess.run([E.FF, "-v", "error", "-ss", f"{t:.2f}", "-i", str(out), "-frames:v", "1",
+                              "-vf", "scale=180:320", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+                             capture_output=True).stdout
+        if len(raw) != 180 * 320 * 3:
+            continue
+        img = np.frombuffer(raw, np.uint8).reshape(320, 180, 3).copy()
+        x = int(pl["split"] * 180)
+        img[:, max(0, x - 1):x + 1] = (255, 0, 0)
+        tiles.append(img)
+    if tiles:
+        sheet = np.concatenate(tiles, 1)
+        ppm = work / "qc_split.ppm"
+        ppm.write_bytes(f"P6\n{sheet.shape[1]} {sheet.shape[0]}\n255\n".encode() + sheet.tobytes())
+        E.sh([E.FF, "-y", "-v", "error", "-i", str(ppm), str(work / "qc_split.jpg")])
+        ppm.unlink()
 
 
 ROOT_EDITS = E.ROOT / "edits"
