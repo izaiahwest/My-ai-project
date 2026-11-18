@@ -32,8 +32,8 @@ LINE_GAP = 0.8      # a pause this long in a take ends a line (he leaves a beat 
 # ---- Adjustable settings. Override any of them in clone_settings.json at the project root. ----
 SETTINGS = dict(
     split_default=0.50,    # straight vertical split, CapCut style; 0.5 = center
-    split_min=0.35,        # how far it may move to show a product (0.40 = a 40/60 split)
-    split_max=0.65,
+    split_min=0.50,        # fixed at the center, evenly balanced like one CapCut mask (his call 2026-11-18:
+    split_max=0.50,        #   moving it let one side dominate). Widen to e.g. 0.40-0.60 to let it shift for products
     feather_px=160,        # soft edge at 1080 wide. 160: the light change between takes fades out (10 left a visible line; his CapCut example, 2026-11-18)
     split_keep=0.15,       # only move the split if the new spot is >15% better (no needless jumps)
     center_pull=0.25,      # how strongly it prefers the center
@@ -148,6 +148,7 @@ def choose_split(fl, fr, prev_x=None):
 def straight_mask(x, path, W=1080, H=1920):
     """0 = left take, 255 = right take; straight line at x (fraction), FEATHER px soft edge."""
     col = np.clip((np.arange(W) - x * W) / max(FEATHER, 1) + 0.5, 0, 1)
+    col = col * col * (3 - 2 * col)   # smooth, symmetric S-curve: exactly 50/50 on the line, equal on both sides
     img = np.tile((col * 255).round().astype(np.uint8), (H, 1))
     path.write_bytes(f"P5\n{W} {H}\n255\n".encode() + img.tobytes())
 
