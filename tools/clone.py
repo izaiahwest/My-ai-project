@@ -90,6 +90,25 @@ def find_seam(fl, fr):
     return seam, stats
 
 
+def span_frames(src, start, dur, n=16):
+    out = subprocess.run([E.FF, "-v", "error", "-ss", f"{start:.3f}", "-t", f"{max(dur, 0.1):.3f}", "-i", str(src),
+                          "-vf", f"fps={n / max(dur, 0.1):.4f},scale={TW}:{TH},format=gray", "-f", "rawvideo", "-"],
+                         capture_output=True).stdout
+    k = len(out) // (TW * TH)
+    return np.frombuffer(out[: k * TW * TH], np.uint8).reshape(k, TH, TW).astype(np.float32)
+
+
+def run_mask(fl, fr, path, fallback):
+    """Seam for ONE turn: goes through what's still and matching in THESE two clips. When he
+    holds the product toward the middle while talking, the seam moves over toward the other
+    side (he's sitting still there) instead of cutting the product off (IMG_1930, 2026-11-18)."""
+    if len(fl) < 2 or len(fr) < 2:
+        return fallback, None
+    seam, st = find_seam(fl, fr)
+    write_mask(seam, path)
+    return path, st
+
+
 def write_mask(seam, path, W=1080, H=1920):
     """Gray mask: 0 = left take, 255 = right take, soft ramp across the seam."""
     s = W / TW
@@ -156,17 +175,32 @@ def expect(w):
     return 0.15 + 0.085 * len(E.norm(w["w"]))
 
 
-def eff_s(w):
-    """Whisper sometimes stretches a word back over a long pause ("no" lasting 8 s); use a
-    believable start for it."""
-    return max(w["s"], w["e"] - 1.3 * expect(w)) if w["e"] - w["s"] > 1.6 * expect(w) else w["s"]
+def eff_s(w, t=None):
+    """Whisper sometimes stretches a word over a long pause. Stretched BACKWARD ("no" lasting 8 s
+    before a line): use a believable start. Stretched FORWARD ("all." running 2 s past the end of
+    a sentence): the start is real. With the take's audio we can tell which: is he talking right
+    at Whisper's start time?"""
+    if w["e"] - w["s"] <= 1.6 * expect(w):
+        return w["s"]
+    if t is not None:
+        sm = t.setdefault("_sm", 20 * np.log10(np.convolve(t["env"], np.ones(20) / 20, "same") + 1e-9))
+        lvl = t.setdefault("_lvl", float(np.percentile(sm, 95)))
+        seg = sm[int(w["s"] * 1000):int(w["s"] * 1000) + 300]
+        if len(seg) and (seg > lvl - 15).mean() >= 0.4:
+            return w["s"]
+    return max(w["s"], w["e"] - 1.3 * expect(w))
 
 
-def first_group(words):
-    for i in range(1, len(words)):
-        if eff_s(words[i]) - words[i - 1]["e"] >= LINE_GAP:
-            return i
-    return len(words)
+def raw_groups(t, n=3):
+    """First n stretches of talk in the take, split on pauses (index ranges into t["words"])."""
+    ws, out, a = t["words"], [], 0
+    for i in range(1, len(ws) + 1):
+        if i == len(ws) or eff_s(ws[i], t) - ws[i - 1]["e"] >= LINE_GAP:
+            out.append((a, i))
+            a = i
+            if len(out) == n:
+                break
+    return out
 
 
 def analyze_take(raw, k, together=False):
@@ -179,12 +213,16 @@ def analyze_take(raw, k, together=False):
     return t
 
 
-def set_kept(t, together):
+def set_kept(t, together, hook=None):
+    """hook = (start, end) word range of the hook said together. Words before it are a false
+    start ("I'm definitely the boy-"), dropped."""
     if together:
         # the hook is said by both at once: it's its own line, never a "retake" of a later line
-        i = first_group(t["words"])
-        k1, _, r1 = E.choose_words(t["words"][:i])
-        k2, _, r2 = E.choose_words(t["words"][i:])
+        lo, hi = hook or raw_groups(t, 1)[0]
+        k1, _, r1 = E.choose_words(t["words"][lo:hi])
+        k2, _, r2 = E.choose_words(t["words"][hi:])
+        if lo:
+            r1 = [" ".join(w["w"] for w in t["words"][:lo])] + r1
         t["kept"], t["retakes"], t["hook_n"] = k1 + k2, r1 + r2, len(k1)
     else:
         t["kept"], _, t["retakes"] = E.choose_words(t["words"])
@@ -193,15 +231,20 @@ def set_kept(t, together):
 
 def same_hook(takes):
     """Both takes open with the same line -> say it together (his call 2026-11-18: together
-    when the lines match, normal back-and-forth when they don't)."""
+    when the lines match, normal back-and-forth when they don't). Compares each take's first
+    3 stretches of talk and picks the best-matching pair, so a false start before the hook
+    ("I'm definitely the boy-" then "I'm definitely the better boyfriend.") is skipped."""
+    ga, gb = raw_groups(takes[0]), raw_groups(takes[1])
+    txt = lambda t, g: letters(w["w"] for w in t["words"][g[0]:g[1]])
+    best = max(((difflib.SequenceMatcher(None, txt(takes[0], a), txt(takes[1], b), autojunk=False).ratio(), a, b)
+                for a in ga for b in gb if b[1] - b[0] >= 2 and a[1] - a[0] >= 2), default=(0, None, None))
+    if best[0] >= 0.75:
+        set_kept(takes[0], True, best[1])
+        set_kept(takes[1], True, best[2])
+        return True
     for t in takes:
-        set_kept(t, True)
-    h = [letters(w["w"] for w in t["kept"][:t["hook_n"]]) for t in takes]
-    ok = all(t["hook_n"] >= 2 for t in takes) and difflib.SequenceMatcher(None, h[0], h[1], autojunk=False).ratio() >= 0.75
-    if not ok:
-        for t in takes:
-            set_kept(t, False)
-    return ok
+        set_kept(t, False)
+    return False
 
 
 def trim_edges(pcs, t, words, drop_db):
@@ -257,7 +300,7 @@ def make_lines(t, script):
     for i, w in enumerate(kept):
         new = (not groups or (t["hook_n"] and i == t["hook_n"])
                or (labels is not None and labels[i] != groups[-1]["key"])
-               or (labels is None and eff_s(w) - groups[-1]["words"][-1]["e"] >= LINE_GAP))
+               or (labels is None and eff_s(w, t) - groups[-1]["words"][-1]["e"] >= LINE_GAP))
         if new:
             groups.append(dict(key=labels[i] if labels else len(groups), words=[], hook=bool(t["hook_n"]) and i == 0))
         groups[-1]["words"].append(w)
@@ -392,16 +435,35 @@ def composite_together(src_l, s_l, src_r, s_r, dur, mask, out):
           "-c:a", "pcm_s16le", str(out)])
 
 
-def process_clone(raws, summary, script_path=None, together="auto"):
-    """together: True / False, or "auto" = together when both takes open with the same line."""
+def pick_script(takes, paths):
+    """Of his saved scripts, the one both takes match best (>= 60% of each side's words)."""
+    best = (0.6, None)
+    for pth in paths:
+        try:
+            sc = read_script(pth)
+        except Exception:
+            continue
+        for order in ((0, 1), (1, 0)):
+            cov = min(label_by_script(takes[i]["kept"], sc, k)[1] for i, k in zip((0, 1), order))
+            if cov > best[0]:
+                best = (cov, pth)
+    return best[1]
+
+
+def process_clone(raws, summary, script_path=None, together="auto", scripts=()):
+    """together: True / False, or "auto" = together when both takes open with the same line.
+    scripts: his saved scripts (iCloud Drive › TikTok Scripts); the best match is used for
+    the order. Returns "ok", "needs_order" or "skipped"."""
     raws = [Path(r) for r in raws]
     if len(raws) != 2:
         raise ValueError("clone needs exactly 2 takes (one per side)")
     stem = f"{raws[0].stem}_clone" + ("_together" if together is True else "")
     work = ROOT_EDITS / stem
     work.mkdir(parents=True, exist_ok=True)
-    script = read_script(script_path) if script_path else None
     takes = [analyze_take(r, k, together is True) for k, r in enumerate(raws)]
+    if not script_path and scripts:
+        script_path = pick_script(takes, scripts)
+    script = read_script(script_path) if script_path else None
     if together == "auto":
         together = same_hook(takes)
     if script:  # files in the wrong order? the script says who says what
@@ -424,15 +486,27 @@ def process_clone(raws, summary, script_path=None, together="auto"):
     lines = [ln for _, lns in runs for ln in lns]
     if len(lines) < 2:
         summary.append(f"- **{stem}**: skipped, found {len(lines)} line(s); need both takes talking.")
-        return
-    parts, plan = [], []
+        return "skipped"
+    if not script:
+        na, nb = (sum(1 for ln in t["lines"] if not ln["hook"]) for t in takes)
+        if abs(na - nb) > 1:
+            # He paused in the middle of his own turns (showing the product), so the takes split
+            # into very different numbers of lines and A/B/A/B would scramble the conversation.
+            # Don't guess (IMG_1930/1931, 2026-11-18: 6 vs 17 lines).
+            summary.append(f"- **{stem}**: NOT edited, lines don't line up ({na} vs {nb}): needs the script "
+                           f"(iCloud Drive › TikTok Scripts) or Claude to put them in order.")
+            return "needs_order"
+    parts, plan, run_stats = [], [], []
     for ri, (k, lns) in enumerate(runs):
         if k == "both":
             hl, hr = (lns[0], lns[1]) if left == 0 else (lns[1], lns[0])
             sl, sr = hl["pieces"][0][0], hr["pieces"][0][0]
             d = round(max(hl["pieces"][-1][1] - sl, hr["pieces"][-1][1] - sr) * E.FPS) / E.FPS
             out = work / f"run{ri:02d}.mov"
-            composite_together(takes[hl["take"]]["src"], sl, takes[hr["take"]]["src"], sr, d, mask, out)
+            rmask, rst = run_mask(span_frames(takes[hl["take"]]["src"], sl, d), span_frames(takes[hr["take"]]["src"], sr, d),
+                                  work / f"mask{ri:02d}.pgm", mask)
+            run_stats.append(rst)
+            composite_together(takes[hl["take"]]["src"], sl, takes[hr["take"]]["src"], sr, d, rmask, out)
             parts.append(out)
             plan.append(dict(talker="both", seconds=round(d, 2), lines=[ln["text"] for ln in lns]))
             continue
@@ -448,7 +522,10 @@ def process_clone(raws, summary, script_path=None, together="auto"):
             r0, r1 = 0.0, lis["dur"]
         g0, glen = pick_listening(lis, (r0, r1), d)
         out = work / f"run{ri:02d}.mov"
-        composite(spk_file, k == left, lis["src"], g0, glen, d, mask, out)
+        f_spk, f_lis = span_frames(spk_file, 0, d), span_frames(lis["src"], g0, min(glen, d))
+        rmask, rst = run_mask(*((f_spk, f_lis) if k == left else (f_lis, f_spk)), work / f"mask{ri:02d}.pgm", mask)
+        run_stats.append(rst)
+        composite(spk_file, k == left, lis["src"], g0, glen, d, rmask, out)
         spk_file.unlink()
         parts.append(out)
         plan.append(dict(talker="left" if k == left else "right", take=spk["raw"].name, seconds=round(d, 2),
@@ -470,6 +547,11 @@ def process_clone(raws, summary, script_path=None, together="auto"):
     empty = empty_seat_frames(out, seam, fl_, fr_)
     if empty:
         warn.append(f"one side shows an empty seat at {empty[:8]} s (a 'pop in')")
+    rs = [r for r in run_stats if r]
+    if rs:  # judge by the per-turn seams actually used
+        seam_stats = dict(seam_stats, background_diff=float(np.median([r["background_diff"] for r in rs])),
+                          motion_on_seam=float(max(r["motion_on_seam"] for r in rs)),
+                          per_turn=[[r["background_diff"], r["motion_on_seam"], r["seam_x"]] for r in rs])
     if seam_stats["background_diff"] > 18:  # 13.5 on his first real car test with a clean seam (hair near it)
         warn.append("the two takes don't line up (phone moved or the light changed); the middle may show a line")
     if seam_stats["motion_on_seam"] > 25:
@@ -496,6 +578,7 @@ def process_clone(raws, summary, script_path=None, together="auto"):
         + (f"\n  - Issues: {'; '.join(warn)}" if warn else "")
         + (f"\n  - QC: doubled {rep['doubled']}, silences {rep['silences'][:3]}, missing {rep['missing'][:3]}"
            if not (rep["letter_match"] >= 0.93 and not rep["doubled"] and not rep["silences"]) else ""))
+    return "ok"
 
 
 def empty_seat_frames(out, seam, fl, fr):

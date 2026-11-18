@@ -234,6 +234,8 @@ def build_pieces(words_all, kept, env, t0, dur):
             lo = max(lo, first["e"] - 1.3 * expect(first))
         if last["e"] - last["s"] > 1.6 * expect(last):
             hi = min(hi, last["s"] + 1.3 * expect(last) + POST)
+        if hi - lo < 0.05:  # a one-word line Whisper stretched at both ends: fall back to its own times
+            lo, hi = max(t0, first["s"]), min(dur, max(last["e"], first["s"] + 0.1))
         # voiced regions inside the window, split on silences > GAP
         ia, ib = int(lo * 1000), int(hi * 1000)
         # 20 ms smoothed level: single 1 ms noise spikes (rustle, breath, clicks) must not
