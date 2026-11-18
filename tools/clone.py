@@ -187,28 +187,49 @@ def analyze_take(raw, k, together=False):
     return t
 
 
-def trim_edges(pcs, t, words):
-    """Tighten where a line starts and ends, judged against THIS line's own voice level.
-    Clone takes are mostly silence, so the whole-take threshold sits too low and keeps
-    breaths / car noise at the line edges (0.2-0.35 s each side, his feedback 2026-11-18:
-    'back to back to back'). Never trims more than 0.1 s into Whisper's first/last word."""
+def trim_edges(pcs, t, words, drop_db):
+    """Cut a line right where its loud waveform starts / ends, judged against THIS line's own
+    voice level (drop_db under it). Clone takes are mostly silence, so the whole-take threshold
+    kept breaths / car noise at line edges. His feedback 2026-11-18: 'back to back to back',
+    'right after the louder waveform, boom, cut'. Never more than 0.12 s into Whisper's
+    first/last word; Whisper re-checks the result (see tight_line)."""
     if not pcs or not words:
         return pcs
     sm = 20 * np.log10(np.convolve(t["env"], np.ones(20) / 20, "same") + 1e-9)
     a, b = int(eff_s(words[0]) * 1000), int(words[-1]["e"] * 1000)
     if b - a < 80:
         return pcs
-    thr = np.percentile(sm[a:b], 85) - 10  # -13 kept breath / passing-car tails at about -31 dB (car test)
+    thr = np.percentile(sm[a:b], 85) - drop_db
     pcs = [list(p) for p in pcs]
-    i, stop = int(pcs[0][0] * 1000), min(int((eff_s(words[0]) + 0.10) * 1000), int(pcs[0][1] * 1000) - 40)
+    i, stop = int(pcs[0][0] * 1000), min(int((eff_s(words[0]) + 0.12) * 1000), int(pcs[0][1] * 1000) - 40)
     while i < stop and sm[i] <= thr:
         i += 1
-    pcs[0][0] = max(pcs[0][0], round((i / 1000 - 0.010) * E.FPS) / E.FPS)
-    j, stop = int(pcs[-1][1] * 1000) - 1, max(int((words[-1]["e"] - 0.10) * 1000), int(pcs[-1][0] * 1000) + 40)
+    pcs[0][0] = max(pcs[0][0], np.floor((i / 1000 - 0.005) * E.FPS) / E.FPS)
+    j, stop = int(pcs[-1][1] * 1000) - 1, max(int((words[-1]["e"] - 0.12) * 1000), int(pcs[-1][0] * 1000) + 40)
     while j > stop and sm[j] <= thr:
         j -= 1
-    pcs[-1][1] = min(pcs[-1][1], round((j / 1000 + 0.025) * E.FPS) / E.FPS)
-    return [tuple(p) for p in pcs if p[1] - p[0] >= 1 / E.FPS]
+    pcs[-1][1] = min(pcs[-1][1], np.ceil((j / 1000 + 0.010) * E.FPS) / E.FPS)
+    return [(float(x), float(y)) for x, y in pcs if y - x >= 1 / E.FPS]
+
+
+def letters(ws):
+    return "".join(E.norm(w) for w in ws)
+
+
+def tight_line(pcs, t, words):
+    """Tightest edge trim that still keeps every word: try cutting 7 dB under his voice, check
+    with Whisper that the first and last words are still heard; back off to 10, then 13 dB."""
+    want = letters(w["w"] for w in words)
+    for drop in (7, 10, 13):
+        cand = trim_edges(pcs, t, words, drop)
+        clip = np.concatenate([t["audio"][int(a * E.SR):int(b * E.SR)] for a, b in cand] or [np.zeros(1, np.float32)])
+        clip = np.concatenate([np.zeros(int(0.3 * E.SR), np.float32), clip, np.zeros(int(0.3 * E.SR), np.float32)])
+        segs, _ = E.model().transcribe(clip, word_timestamps=False, vad_filter=False, condition_on_previous_text=False)
+        got = letters(" ".join(sg.text for sg in segs).split())
+        sim = lambda x, y: difflib.SequenceMatcher(None, x, y, autojunk=False).ratio()
+        if (sim(want, got) >= 0.9 and sim(want[:6], got[:6]) >= 0.65 and sim(want[-6:], got[-6:]) >= 0.65):
+            return cand, drop
+    return pcs, None
 
 
 def make_lines(t, script):
@@ -227,9 +248,9 @@ def make_lines(t, script):
     for g in groups:
         pcs = E.build_pieces(t["words"], g["words"], t["env"], 0.0, t["dur"])
         pcs, _ = E.clean_pieces(pcs, t["audio"])
-        pcs = trim_edges(pcs, t, g["words"])
+        pcs, drop = tight_line(pcs, t, g["words"])
         if pcs:
-            t["lines"].append(dict(take=t["k"], key=g["key"], pieces=pcs, hook=g["hook"],
+            t["lines"].append(dict(take=t["k"], key=g["key"], pieces=pcs, hook=g["hook"], trim_db=drop,
                                    text=" ".join(w["w"] for w in g["words"])))
     t["quiet"] = quiet_spans(t)
 
@@ -318,18 +339,22 @@ def pick_listening(t, region, need):
 def composite(spk_file, spk_left, lis_src, g0, glen, dur, mask, out):
     """Talker on their side, listener on the other, blended through the mask."""
     if glen + 1e-3 >= dur:
-        lis = "[1:v]setpts=PTS-STARTPTS[lis]"
+        lis = f"[1:v]fps={E.FPS},setpts=PTS-STARTPTS[lis]"
     else:  # not enough quiet footage: play it forward then backward, repeated
         n = max(1, round(2 * glen * E.FPS))
         loops = math.ceil(dur / (2 * glen)) + 1
-        lis = (f"[1:v]setpts=PTS-STARTPTS,split[f][r];[r]reverse[rv];[f][rv]concat=n=2:v=1:a=0,"
+        lis = (f"[1:v]fps={E.FPS},setpts=PTS-STARTPTS,split[f][r];[r]reverse[rv];[f][rv]concat=n=2:v=1:a=0,"
                f"loop=loop={loops}:size={n}:start=0,setpts=N/{E.FPS}/TB[lis]")
-    L, R = ("[0:v]", "[lis]") if spk_left else ("[lis]", "[0:v]")
-    fc = (f"{lis};[2:v]format=gray[m];{R}[m]alphamerge[ra];"
-          f"{L}[ra]overlay=0:0:shortest=1:format=auto,format=yuv420p[v]")
+    L, R = ("[spk]", "[lis]") if spk_left else ("[lis]", "[spk]")
+    # Every stream re-timed to start at 0. Without this the talker's half was missing its first
+    # frame at each switch, so the bare other take (an EMPTY seat) flashed for a frame - his
+    # "pop in" (2026-11-18).
+    fc = (f"[0:v]fps={E.FPS},setpts=PTS-STARTPTS[spk];{lis};"
+          f"[2:v]fps={E.FPS},setpts=PTS-STARTPTS,format=gray[m];{R}[m]alphamerge[ra];"
+          f"{L}[ra]overlay=0:0:eof_action=repeat:format=auto,format=yuv420p[v]")
     E.sh([E.FF, "-y", "-v", "error", "-i", str(spk_file),
           "-ss", f"{g0:.4f}", "-t", f"{glen + 0.1:.4f}", "-i", str(lis_src),
-          "-loop", "1", "-i", str(mask),
+          "-loop", "1", "-framerate", str(E.FPS), "-i", str(mask),
           "-filter_complex", fc, "-map", "[v]", "-map", "0:a", "-t", f"{dur:.4f}",
           "-c:v", "libx264", "-crf", "10", "-preset", "veryfast", "-pix_fmt", "yuv420p",
           "-c:a", "pcm_s16le", str(out)])
@@ -337,12 +362,14 @@ def composite(spk_file, spk_left, lis_src, g0, glen, dur, mask, out):
 
 def composite_together(src_l, s_l, src_r, s_r, dur, mask, out):
     """Hook said by both at once: each side plays its own take, voices mixed, starts lined up."""
-    fc = (f"[0:v]setpts=PTS-STARTPTS[l];[1:v]setpts=PTS-STARTPTS[r];[2:v]format=gray[m];"
-          f"[r][m]alphamerge[ra];[l][ra]overlay=0:0:shortest=1:format=auto,format=yuv420p[v];"
+    fc = (f"[0:v]fps={E.FPS},setpts=PTS-STARTPTS[l];[1:v]fps={E.FPS},setpts=PTS-STARTPTS[r];"
+          f"[2:v]fps={E.FPS},setpts=PTS-STARTPTS,format=gray[m];"
+          f"[r][m]alphamerge[ra];[l][ra]overlay=0:0:eof_action=repeat:format=auto,format=yuv420p[v];"
           f"[0:a][1:a]amix=inputs=2:normalize=0,afade=t=in:d=0.004,"
           f"afade=t=out:st={max(0, dur - 0.006):.3f}:d=0.006[a]")
     E.sh([E.FF, "-y", "-v", "error", "-ss", f"{s_l:.4f}", "-t", f"{dur + 0.1:.4f}", "-i", str(src_l),
-          "-ss", f"{s_r:.4f}", "-t", f"{dur + 0.1:.4f}", "-i", str(src_r), "-loop", "1", "-i", str(mask),
+          "-ss", f"{s_r:.4f}", "-t", f"{dur + 0.1:.4f}", "-i", str(src_r),
+          "-loop", "1", "-framerate", str(E.FPS), "-i", str(mask),
           "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", f"{dur:.4f}", "-ar", "48000", "-ac", "2",
           "-c:v", "libx264", "-crf", "10", "-preset", "veryfast", "-pix_fmt", "yuv420p",
           "-c:a", "pcm_s16le", str(out)])
@@ -419,6 +446,10 @@ def process_clone(raws, summary, script_path=None, together=False):
     rep = E.qc(out, intended, work)
     seam_preview(out, seam, work)
     warn = []
+    fl_, fr_ = (fa, fb) if left == 0 else (fb, fa)
+    empty = empty_seat_frames(out, seam, fl_, fr_)
+    if empty:
+        warn.append(f"one side shows an empty seat at {empty[:8]} s (a 'pop in')")
     if seam_stats["background_diff"] > 18:  # 13.5 on his first real car test with a clean seam (hair near it)
         warn.append("the two takes don't line up (phone moved or the light changed); the middle may show a line")
     if seam_stats["motion_on_seam"] > 25:
@@ -432,7 +463,8 @@ def process_clone(raws, summary, script_path=None, together=False):
     rep["ok"] = rep["ok"] and not warn
     (work / "plan.json").write_text(json.dumps(dict(
         takes=[r.name for r in raws], left=raws[left].name, seam=seam_stats, runs=plan,
-        retakes=[t["retakes"] for t in takes]), indent=1))
+        retakes=[t["retakes"] for t in takes],
+        trim_db=[[ln.get("trim_db") for ln in t["lines"]] for t in takes], empty_seat_frames=empty), indent=1))
     (work / "qc.json").write_text(json.dumps(rep, indent=1))
     E.JOINED.parent.mkdir(exist_ok=True)
     E.JOINED.write_text(json.dumps(sorted(E.joined_members() | {r.name for r in raws})))
@@ -444,6 +476,26 @@ def process_clone(raws, summary, script_path=None, together=False):
         + (f"\n  - Issues: {'; '.join(warn)}" if warn else "")
         + (f"\n  - QC: doubled {rep['doubled']}, silences {rep['silences'][:3]}, missing {rep['missing'][:3]}"
            if not (rep["letter_match"] >= 0.93 and not rep["doubled"] and not rep["silences"]) else ""))
+
+
+def empty_seat_frames(out, seam, fl, fr):
+    """Frames where one side shows an empty seat (the other take's background) instead of him.
+    Left side is compared with the RIGHT take's still background (his seat is empty there), and
+    the other way round. Returns times (s)."""
+    out_f = gray_frames_all(out)
+    lo, hi = int(seam.min()) - 12, int(seam.max()) + 12
+    ref_l, ref_r = np.median(fr, 0)[:, :max(lo, 1)], np.median(fl, 0)[:, min(hi, TW - 1):]
+    dl = np.abs(out_f[:, :, :max(lo, 1)] - ref_l).mean((1, 2))
+    dr = np.abs(out_f[:, :, min(hi, TW - 1):] - ref_r).mean((1, 2))
+    bad = (dl < 0.4 * np.median(dl)) | (dr < 0.4 * np.median(dr))
+    return [round(i / E.FPS, 2) for i in np.flatnonzero(bad)]
+
+
+def gray_frames_all(src):
+    out = subprocess.run([E.FF, "-v", "error", "-i", str(src), "-vf", f"scale={TW}:{TH},format=gray",
+                          "-f", "rawvideo", "-"], capture_output=True).stdout
+    k = len(out) // (TW * TH)
+    return np.frombuffer(out[: k * TW * TH], np.uint8).reshape(k, TH, TW).astype(np.float32)
 
 
 def seam_preview(out, seam, work):
