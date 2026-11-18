@@ -3,7 +3,7 @@
   "split_default": 0.5,
   "split_min": 0.35,
   "split_max": 0.65,
-  "feather_px": 10,
+  "feather_px": 160,
   "split_keep": 0.15,
   "center_pull": 0.25,
   "turn_gap_ms": 0,

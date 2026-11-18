@@ -34,7 +34,7 @@ SETTINGS = dict(
     split_default=0.50,    # straight vertical split, CapCut style; 0.5 = center
     split_min=0.35,        # how far it may move to show a product (0.40 = a 40/60 split)
     split_max=0.65,
-    feather_px=10,         # soft edge at 1080 wide
+    feather_px=160,        # soft edge at 1080 wide. 160: the light change between takes fades out (10 left a visible line; his CapCut example, 2026-11-18)
     split_keep=0.15,       # only move the split if the new spot is >15% better (no needless jumps)
     center_pull=0.25,      # how strongly it prefers the center
     turn_gap_ms=0,         # silence added between speakers (0 = his approved back-to-back pace)
