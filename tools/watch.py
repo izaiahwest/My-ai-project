@@ -58,6 +58,37 @@ end run
 """
 
 
+REMIND = """
+on run argv
+  tell application "Reminders"
+    if not (exists list "TikTok Editor") then make new list with properties {name:"TikTok Editor"}
+    tell list "TikTok Editor"
+      repeat with r in (every reminder whose completed is false)
+        set completed of r to true
+      end repeat
+      make new reminder with properties {name:(item 1 of argv), body:(item 2 of argv), remind me date:((current date) + 20)}
+    end tell
+  end tell
+end run
+"""
+
+
+def alert_me(title, body=""):
+    """Phone alert with sound: a Reminder in his "TikTok Editor" list, due in 20 s, synced by
+    iCloud. (Texts to himself never alert on his iPhone.) Older ones are ticked off so the list
+    stays clean. His pick, 2026-11-18."""
+    r = subprocess.run(["osascript", "-e", REMIND, title, body], capture_output=True, text=True, timeout=120)
+    if r.returncode:
+        log(f"alert failed: {r.stderr.strip()[:200]}")
+
+
+def tell(title, body="", video=None):
+    """Mac pop-up + phone alert (Reminders) + text with the video (to watch in Messages)."""
+    notify(title, body)
+    alert_me(title, body)
+    text_me(f"{title}. {body}".strip(" ."), video)
+
+
 def text_me(msg, video=None):
     """iMessage him (to himself) so his phone buzzes, with the video attached to preview."""
     try:
@@ -146,8 +177,7 @@ def one_pass(state):
     log(f"{len(files)} new clip(s): {len(pairs)} pair(s), {len(left)} unpaired")
     if pairs:
         msg = f"Got {len(files)} clip(s) → {len(pairs)} video(s). Editing now, about 3–5 min each."
-        notify("Editing clone videos", msg)
-        text_me("🎬 " + msg)
+        tell("🎬 Editing", msg)
     scripts = sorted(p for p in SCRIPTS.glob("*") if p.suffix.lower() in (".txt", ".md")) if SCRIPTS.exists() else []
     summary, made = [], 0
     for n, (a, b, why) in enumerate(pairs, 1):
@@ -161,22 +191,20 @@ def one_pass(state):
             status = C.process_clone([ra, rb], summary, None, "auto", scripts)
             out = E.ROOT / "final" / f"{ra.stem}_clone.mp4"
             if status == "needs_order":
-                notify(f"Video {n} of {len(pairs)} needs the order", "Message Claude.")
-                text_me(f"⚠️ Video {n} of {len(pairs)} ({ra.name} + {rb.name}): couldn't tell the order of the "
-                        "lines (you paused mid-turn). Save the script in iCloud Drive › TikTok Scripts, or message Claude.")
+                tell(f"⚠️ Video {n} of {len(pairs)} needs the script",
+                     f"{ra.name} + {rb.name}: couldn't tell the order of the lines (you paused mid-turn). "
+                     "Save the script in iCloud Drive › TikTok Scripts, or message Claude.")
             elif status == "ok" and out.exists():
                 made += 1
                 ICLOUD.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(out, ICLOUD / out.name)
                 flag = " ⚠️ check this one" if any("⚠️" in x for x in summary[n0:]) else ""
-                notify(f"Video {n} of {len(pairs)} ready", f"{out.name}{flag} · iCloud Drive › TikTok Edits")
-                text_me(f"✅ Video {n} of {len(pairs)} ready{flag}", out)
+                tell(f"✅ Video {n} of {len(pairs)} ready{flag}", "Watch it in Messages or Files › iCloud Drive › TikTok Edits.", out)
             log("\n".join(summary[n0:]))
         except Exception as e:
             summary.append(f"- **clone {ra.name} + {rb.name}**: FAILED: {e}")
             log(traceback.format_exc())
-            notify(f"Video {n} of {len(pairs)} failed", f"{ra.name} + {rb.name}. Message Claude.")
-            text_me(f"❌ Video {n} of {len(pairs)} failed ({ra.name} + {rb.name}). Message Claude.")
+            tell(f"❌ Video {n} of {len(pairs)} failed", f"{ra.name} + {rb.name}. Message Claude.")
     stuck = []
     for f, why in left:
         key = f"{f.name}:{f.stat().st_size}"
@@ -198,8 +226,7 @@ def one_pass(state):
         with sp.open("a") as fh:
             fh.write(head + "\n".join(summary) + "\n")
     if stuck:
-        notify("Clips not edited", f"Couldn't pair {len(stuck)} new clip(s): {', '.join(stuck[:3])}. Message Claude.")
-        text_me(f"⚠️ Couldn't pair {len(stuck)} new clip(s): {', '.join(stuck[:3])}. Message Claude.")
+        tell("⚠️ Clips not edited", f"Couldn't pair {len(stuck)} new clip(s): {', '.join(stuck[:3])}. Message Claude.")
     return made
 
 
