@@ -147,9 +147,17 @@ def choose_words(words):
         p = restart_at(kept, j)
         if p is not None:
             gone = kept[p:]
+            # "...gift. No, I have the best..." - Whisper often stretches the word right before a
+            # restart ("no" lasting 8 s). That word really starts the new attempt: keep it.
+            lead = None
+            if len(gone) >= 2:
+                w0 = words[gone[-1]]
+                if (words[j]["s"] - w0["e"] < 0.15
+                        and w0["e"] - w0["s"] > 1.6 * (0.15 + 0.085 * len(toks[gone[-1]]))):
+                    lead = gone.pop()
             retakes.append(" ".join(words[x]["w"] for x in gone))
             dropped += [words[x] for x in gone]
-            kept = kept[:p]
+            kept = kept[:p] + ([lead] if lead is not None else [])
         kept.append(j)
     return [words[x] for x in kept], dropped, retakes
 
@@ -372,8 +380,18 @@ def finish(joined, out_path):
                        capture_output=True, text=True).stderr
     measured = float(re.findall(r"I:\s+(-?[\d.]+) LUFS", r)[-1])
     gain = -16.0 - measured
-    af = (f"volume={gain:.2f}dB,aresample=192000,alimiter=limit={10 ** (-2.0 / 20):.4f}"
-          f":attack=1:release=50:level=false,aresample=48000")
+    for _ in range(3):  # the limiter eats some loudness on bumpy (car) audio: re-measure and top up
+        af = (f"volume={gain:.2f}dB,aresample=192000,alimiter=limit={10 ** (-2.0 / 20):.4f}"
+              f":attack=1:release=50:level=false,aresample=48000")
+        tmp = Path(str(joined) + ".wav")
+        sh([FF, "-y", "-v", "error", "-i", str(joined), "-vn", "-af", af, "-ar", "48000", str(tmp)])
+        r = subprocess.run([FF, "-i", str(tmp), "-af", "ebur128", "-f", "null", "-"],
+                           capture_output=True, text=True).stderr
+        got = float(re.findall(r"I:\s+(-?[\d.]+) LUFS", r)[-1])
+        tmp.unlink()
+        if abs(got + 16) <= 0.4:
+            break
+        gain += -16.0 - got
     sh([FF, "-y", "-v", "error", "-i", str(joined), "-af", af, "-ar", "48000",
         "-c:v", "libx264", "-crf", "16", "-preset", "slow", "-pix_fmt", "yuv420p", "-r", "30",
         "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709",

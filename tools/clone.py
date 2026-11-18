@@ -187,15 +187,11 @@ def quiet_spans(t):
     n = int(t["dur"] * 100)
     talk = np.zeros(n + 1, bool)
     for w in t["words"]:
-        talk[max(0, int((w["s"] - 0.2) * 100)):int((w["e"] + 0.2) * 100)] = True
+        talk[max(0, int((w["s"] - 0.25) * 100)):int((w["e"] + 0.25) * 100)] = True
     for ln in t["lines"]:
         for s, e in ln["pieces"]:
             talk[max(0, int((s - 0.15) * 100)):int((e + 0.15) * 100)] = True
-    env = t["env"]
-    thr = E.speech_threshold(env, 0, t["dur"])
-    sm = np.convolve(env, np.ones(20) / 20, "same") > thr
-    loud = sm[: (len(sm) // 10) * 10].reshape(-1, 10).any(1)[:n]
-    talk[: len(loud)] |= np.convolve(loud, np.ones(21), "same") > 0  # +-0.1 s
+    # (no audio-level check: car/road noise is loud enough to look like talking all the time)
     m = E.motion_series(t["src"], 0, t["dur"])  # 10 fps
     busy = m > max(3 * float(np.median(m)), 1.5)  # walking in/out, reaching for the phone
     busy = np.convolve(busy, np.ones(7), "same") > 0  # +-0.3 s
@@ -340,7 +336,7 @@ def process_clone(raws, summary, script_path=None):
     rep = E.qc(out, intended, work)
     seam_preview(out, seam, work)
     warn = []
-    if seam_stats["background_diff"] > 12:
+    if seam_stats["background_diff"] > 18:  # 13.5 on his first real car test with a clean seam (hair near it)
         warn.append("the two takes don't line up (phone moved or the light changed); the middle may show a line")
     if seam_stats["motion_on_seam"] > 25:
         warn.append("something crosses the middle; an arm or product may get cut off there")
