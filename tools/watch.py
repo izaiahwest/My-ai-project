@@ -95,6 +95,7 @@ def main():
     except BlockingIOError:
         return  # another run is already editing
     state = json.loads(STATE.read_text()) if STATE.exists() else {"used": [], "ignored": [], "seen": {}}
+    state.setdefault("notified", [])
     files = [f for f in candidates(state) if looks_like_take(f)]
     if not settled(files):
         return
@@ -122,8 +123,14 @@ def main():
         except Exception as e:
             summary.append(f"- **clone {ra.name} + {rb.name}**: FAILED: {e}")
             log(traceback.format_exc())
+    stuck = []
     for f, why in left:
         key = f"{f.name}:{f.stat().st_size}"
+        # filmed in the last day = probably a take we failed to pair (new location, phone bumped):
+        # tell him instead of failing silently
+        if now - C.shot_time(f) < 24 * 3600 and key not in state["notified"]:
+            stuck.append(f.name)
+            state["notified"].append(key)
         if now - state["seen"].get(key, now) > GIVE_UP:
             state["ignored"].append(key)
             log(f"ignoring {f.name} ({why}) after 6 h")
@@ -136,6 +143,8 @@ def main():
         head = "" if sp.exists() else f"# Edits {day}\n\n"
         with sp.open("a") as fh:
             fh.write(head + "\n".join(summary) + "\n")
+    if stuck:
+        notify("Clips not edited", f"Couldn't pair {len(stuck)} new clip(s): {', '.join(stuck[:3])}. Message Claude.")
     if made:
         flagged = sum("⚠️" in s for s in summary)
         notify("Clone videos ready", f"{len(made)} edited" + (f", {flagged} to check" if flagged else "")
