@@ -24,3 +24,7 @@ Newest at the bottom. Format: date: decision (why).
 - Method: locked-off phone, one take per side, blended along a seam through the background. **No body cut-out/masking**: more reliable and no fuzzy edges, but he must stay on his side of the middle. Cut-out masking (for crossing over / handing products across) only if he needs it later.
 - Listening side = that take's quiet, still moments; plays back and forth if there isn't enough.
 - Tested on fake takes only; needs a real 3–4 line test from him before he relies on it.
+
+## 2026-11-18: Clone mode approved after his first real test
+- He: "this is like exactly what I need… I like the overlay." Ask: tighter hand-offs, "back to back to back", no pauses between speakers. Done: line edges trimmed against each line's own voice level.
+- Some videos have both characters say the hook together. **He tells us when**; `--together` does it. Default: not together.

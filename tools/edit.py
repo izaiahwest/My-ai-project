@@ -7,7 +7,7 @@ Usage (on the Mac):
     python tools/edit.py raw/                         # everything in raw/ not yet edited
     python tools/edit.py raw/x.MOV --no-split         # don't split on claps
     python tools/edit.py --join raw/a.MOV raw/b.MOV   # several clips -> one video
-    python tools/edit.py --clone raw/a.MOV raw/b.MOV [--script s.txt]   # split-screen "two of me"
+    python tools/edit.py --clone raw/a.MOV raw/b.MOV [--script s.txt] [--together]   # split-screen "two of me"
 
 For each raw file:
   1. Split on claps (one clap between videos) into separate takes.
@@ -573,6 +573,7 @@ def main():
     ap.add_argument("--clone", action="store_true",
                     help="two takes from a phone that didn't move -> one split-screen 'two of me' video")
     ap.add_argument("--script", help="(clone) text file, lines like 'A: ...' / 'B: ...' (A = first take)")
+    ap.add_argument("--together", action="store_true", help="(clone) both say the first line (hook) at the same time")
     a = ap.parse_args()
     files = []
     for x in map(Path, a.inputs):
@@ -583,7 +584,7 @@ def main():
         sys.modules.setdefault("edit", sys.modules[__name__])  # clone.py reuses this module
         import clone
         try:
-            clone.process_clone(files, summary, a.script)
+            clone.process_clone(files, summary, a.script, a.together)
         except Exception as e:
             summary.append(f"- **clone {[f.name for f in files]}**: FAILED: {e}")
         files = []

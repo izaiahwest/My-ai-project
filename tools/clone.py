@@ -152,14 +152,63 @@ def label_by_script(kept, script, take):
     return out, sum(n for *_, n in blocks) / len(sw)
 
 
-def analyze_take(raw, k):
+def expect(w):
+    return 0.15 + 0.085 * len(E.norm(w["w"]))
+
+
+def eff_s(w):
+    """Whisper sometimes stretches a word back over a long pause ("no" lasting 8 s); use a
+    believable start for it."""
+    return max(w["s"], w["e"] - 1.3 * expect(w)) if w["e"] - w["s"] > 1.6 * expect(w) else w["s"]
+
+
+def first_group(words):
+    for i in range(1, len(words)):
+        if eff_s(words[i]) - words[i - 1]["e"] >= LINE_GAP:
+            return i
+    return len(words)
+
+
+def analyze_take(raw, k, together=False):
     src = E.make_proxy(Path(raw))
     t = dict(raw=Path(raw), src=src, k=k, dur=E.probe(src))
     t["audio"] = E.load_audio(src)
     t["words"] = E.transcribe(t["audio"])
     t["env"] = E.env_ms(t["audio"])
-    t["kept"], _, t["retakes"] = E.choose_words(t["words"])
+    if together:
+        # the hook is said by both at once: it's its own line, never a "retake" of a later line
+        i = first_group(t["words"])
+        k1, _, r1 = E.choose_words(t["words"][:i])
+        k2, _, r2 = E.choose_words(t["words"][i:])
+        t["kept"], t["retakes"], t["hook_n"] = k1 + k2, r1 + r2, len(k1)
+    else:
+        t["kept"], _, t["retakes"] = E.choose_words(t["words"])
+        t["hook_n"] = 0
     return t
+
+
+def trim_edges(pcs, t, words):
+    """Tighten where a line starts and ends, judged against THIS line's own voice level.
+    Clone takes are mostly silence, so the whole-take threshold sits too low and keeps
+    breaths / car noise at the line edges (0.2-0.35 s each side, his feedback 2026-11-18:
+    'back to back to back'). Never trims more than 0.1 s into Whisper's first/last word."""
+    if not pcs or not words:
+        return pcs
+    sm = 20 * np.log10(np.convolve(t["env"], np.ones(20) / 20, "same") + 1e-9)
+    a, b = int(eff_s(words[0]) * 1000), int(words[-1]["e"] * 1000)
+    if b - a < 80:
+        return pcs
+    thr = np.percentile(sm[a:b], 85) - 10  # -13 kept breath / passing-car tails at about -31 dB (car test)
+    pcs = [list(p) for p in pcs]
+    i, stop = int(pcs[0][0] * 1000), min(int((eff_s(words[0]) + 0.10) * 1000), int(pcs[0][1] * 1000) - 40)
+    while i < stop and sm[i] <= thr:
+        i += 1
+    pcs[0][0] = max(pcs[0][0], round((i / 1000 - 0.010) * E.FPS) / E.FPS)
+    j, stop = int(pcs[-1][1] * 1000) - 1, max(int((words[-1]["e"] - 0.10) * 1000), int(pcs[-1][0] * 1000) + 40)
+    while j > stop and sm[j] <= thr:
+        j -= 1
+    pcs[-1][1] = min(pcs[-1][1], round((j / 1000 + 0.025) * E.FPS) / E.FPS)
+    return [tuple(p) for p in pcs if p[1] - p[0] >= 1 / E.FPS]
 
 
 def make_lines(t, script):
@@ -168,17 +217,20 @@ def make_lines(t, script):
     t["script_match"] = cover
     groups = []
     for i, w in enumerate(kept):
-        new = (not groups or (labels is not None and labels[i] != groups[-1]["key"])
-               or (labels is None and w["s"] - groups[-1]["words"][-1]["e"] >= LINE_GAP))
+        new = (not groups or (t["hook_n"] and i == t["hook_n"])
+               or (labels is not None and labels[i] != groups[-1]["key"])
+               or (labels is None and eff_s(w) - groups[-1]["words"][-1]["e"] >= LINE_GAP))
         if new:
-            groups.append(dict(key=labels[i] if labels else len(groups), words=[]))
+            groups.append(dict(key=labels[i] if labels else len(groups), words=[], hook=bool(t["hook_n"]) and i == 0))
         groups[-1]["words"].append(w)
     t["lines"] = []
     for g in groups:
         pcs = E.build_pieces(t["words"], g["words"], t["env"], 0.0, t["dur"])
         pcs, _ = E.clean_pieces(pcs, t["audio"])
+        pcs = trim_edges(pcs, t, g["words"])
         if pcs:
-            t["lines"].append(dict(take=t["k"], key=g["key"], pieces=pcs, text=" ".join(w["w"] for w in g["words"])))
+            t["lines"].append(dict(take=t["k"], key=g["key"], pieces=pcs, hook=g["hook"],
+                                   text=" ".join(w["w"] for w in g["words"])))
     t["quiet"] = quiet_spans(t)
 
 
@@ -221,13 +273,26 @@ def quiet_spans(t):
 
 
 def order_lines(takes, script):
+    """List of runs: (take, [lines]) or ("both", [hookA, hookB]) for a hook said together."""
     a, b = takes[0]["lines"], takes[1]["lines"]
+    head = []
+    if a and b and a[0]["hook"] and b[0]["hook"]:
+        head = [("both", [a[0], b[0]])]
+        a, b = a[1:], b[1:]
     if script:
-        return sorted(a + b, key=lambda ln: (ln["key"], ln["take"]))
-    out = []
-    for i in range(max(len(a), len(b))):  # A, B, A, B... (take 1 talks first)
-        out += a[i:i + 1] + b[i:i + 1]
-    return out
+        seq = sorted(a + b, key=lambda ln: (ln["key"], ln["take"]))
+    else:
+        seq = []
+        first, second = (b, a) if head and len(b) > len(a) else (a, b)  # after a joint hook, whoever has more lines answers
+        for i in range(max(len(a), len(b))):  # A, B, A, B... (take 1 talks first)
+            seq += first[i:i + 1] + second[i:i + 1]
+    runs = list(head)
+    for ln in seq:
+        if runs and runs[-1][0] == ln["take"]:
+            runs[-1][1].append(ln)
+        else:
+            runs.append((ln["take"], [ln]))
+    return runs
 
 
 def pick_listening(t, region, need):
@@ -270,15 +335,28 @@ def composite(spk_file, spk_left, lis_src, g0, glen, dur, mask, out):
           "-c:a", "pcm_s16le", str(out)])
 
 
-def process_clone(raws, summary, script_path=None):
+def composite_together(src_l, s_l, src_r, s_r, dur, mask, out):
+    """Hook said by both at once: each side plays its own take, voices mixed, starts lined up."""
+    fc = (f"[0:v]setpts=PTS-STARTPTS[l];[1:v]setpts=PTS-STARTPTS[r];[2:v]format=gray[m];"
+          f"[r][m]alphamerge[ra];[l][ra]overlay=0:0:shortest=1:format=auto,format=yuv420p[v];"
+          f"[0:a][1:a]amix=inputs=2:normalize=0,afade=t=in:d=0.004,"
+          f"afade=t=out:st={max(0, dur - 0.006):.3f}:d=0.006[a]")
+    E.sh([E.FF, "-y", "-v", "error", "-ss", f"{s_l:.4f}", "-t", f"{dur + 0.1:.4f}", "-i", str(src_l),
+          "-ss", f"{s_r:.4f}", "-t", f"{dur + 0.1:.4f}", "-i", str(src_r), "-loop", "1", "-i", str(mask),
+          "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", f"{dur:.4f}", "-ar", "48000", "-ac", "2",
+          "-c:v", "libx264", "-crf", "10", "-preset", "veryfast", "-pix_fmt", "yuv420p",
+          "-c:a", "pcm_s16le", str(out)])
+
+
+def process_clone(raws, summary, script_path=None, together=False):
     raws = [Path(r) for r in raws]
     if len(raws) != 2:
         raise ValueError("clone needs exactly 2 takes (one per side)")
-    stem = f"{raws[0].stem}_clone"
+    stem = f"{raws[0].stem}_clone" + ("_together" if together else "")
     work = ROOT_EDITS / stem
     work.mkdir(parents=True, exist_ok=True)
     script = read_script(script_path) if script_path else None
-    takes = [analyze_take(r, k) for k, r in enumerate(raws)]
+    takes = [analyze_take(r, k, together) for k, r in enumerate(raws)]
     if script:  # files in the wrong order? the script says who says what
         cov = lambda t, k: label_by_script(t["kept"], script, k)[1]
         if cov(takes[0], 1) + cov(takes[1], 0) > cov(takes[0], 0) + cov(takes[1], 1):
@@ -295,24 +373,28 @@ def process_clone(raws, summary, script_path=None):
     seam, seam_stats = find_seam(*((fa, fb) if left == 0 else (fb, fa)))
     mask = work / "mask.pgm"
     write_mask(seam, mask)
-    lines = order_lines(takes, script)
+    runs = order_lines(takes, script)
+    lines = [ln for _, lns in runs for ln in lns]
     if len(lines) < 2:
         summary.append(f"- **{stem}**: skipped, found {len(lines)} line(s); need both takes talking.")
         return
-    runs = []
-    for ln in lines:
-        if runs and runs[-1][0] == ln["take"]:
-            runs[-1][1].append(ln)
-        else:
-            runs.append((ln["take"], [ln]))
     parts, plan = [], []
     for ri, (k, lns) in enumerate(runs):
+        if k == "both":
+            hl, hr = (lns[0], lns[1]) if left == 0 else (lns[1], lns[0])
+            sl, sr = hl["pieces"][0][0], hr["pieces"][0][0]
+            d = round(max(hl["pieces"][-1][1] - sl, hr["pieces"][-1][1] - sr) * E.FPS) / E.FPS
+            out = work / f"run{ri:02d}.mov"
+            composite_together(takes[hl["take"]]["src"], sl, takes[hr["take"]]["src"], sr, d, mask, out)
+            parts.append(out)
+            plan.append(dict(talker="both", seconds=round(d, 2), lines=[ln["text"] for ln in lns]))
+            continue
         spk, lis = takes[k], takes[1 - k]
         pieces = [p for ln in lns for p in ln["pieces"]]
         spk_file = E.render_pieces(spk["src"], pieces, [0] * len(pieces), work, tag=f"r{ri:02d}_")
         d = E.probe(spk_file)
-        prev = [ln for r in runs[:ri] if r[0] == lis["k"] for ln in r[1]]
-        nxt = [ln for r in runs[ri + 1:] if r[0] == lis["k"] for ln in r[1]]
+        prev = [ln for r in runs[:ri] for ln in r[1] if ln["take"] == lis["k"]]
+        nxt = [ln for r in runs[ri + 1:] for ln in r[1] if ln["take"] == lis["k"]]
         r0 = prev[-1]["pieces"][-1][1] + 0.1 if prev else 0.0
         r1 = nxt[0]["pieces"][0][0] - 0.15 if nxt else lis["dur"]
         if r1 <= r0:  # lines said out of order vs the script
@@ -332,7 +414,8 @@ def process_clone(raws, summary, script_path=None):
     out = E.ROOT / "final" / f"{stem}.mp4"
     E.finish(joined, out)
     joined.unlink()
-    intended = [w for ln in lines for w in ln["text"].split()]
+    # a hook said together is heard once
+    intended = [w for k, lns in runs for ln in (lns[:1] if k == "both" else lns) for w in ln["text"].split()]
     rep = E.qc(out, intended, work)
     seam_preview(out, seam, work)
     warn = []
