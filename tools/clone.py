@@ -175,6 +175,11 @@ def analyze_take(raw, k, together=False):
     t["audio"] = E.load_audio(src)
     t["words"] = E.transcribe(t["audio"])
     t["env"] = E.env_ms(t["audio"])
+    set_kept(t, together)
+    return t
+
+
+def set_kept(t, together):
     if together:
         # the hook is said by both at once: it's its own line, never a "retake" of a later line
         i = first_group(t["words"])
@@ -184,7 +189,19 @@ def analyze_take(raw, k, together=False):
     else:
         t["kept"], _, t["retakes"] = E.choose_words(t["words"])
         t["hook_n"] = 0
-    return t
+
+
+def same_hook(takes):
+    """Both takes open with the same line -> say it together (his call 2026-11-18: together
+    when the lines match, normal back-and-forth when they don't)."""
+    for t in takes:
+        set_kept(t, True)
+    h = [letters(w["w"] for w in t["kept"][:t["hook_n"]]) for t in takes]
+    ok = all(t["hook_n"] >= 2 for t in takes) and difflib.SequenceMatcher(None, h[0], h[1], autojunk=False).ratio() >= 0.75
+    if not ok:
+        for t in takes:
+            set_kept(t, False)
+    return ok
 
 
 def trim_edges(pcs, t, words, drop_db):
@@ -375,15 +392,18 @@ def composite_together(src_l, s_l, src_r, s_r, dur, mask, out):
           "-c:a", "pcm_s16le", str(out)])
 
 
-def process_clone(raws, summary, script_path=None, together=False):
+def process_clone(raws, summary, script_path=None, together="auto"):
+    """together: True / False, or "auto" = together when both takes open with the same line."""
     raws = [Path(r) for r in raws]
     if len(raws) != 2:
         raise ValueError("clone needs exactly 2 takes (one per side)")
-    stem = f"{raws[0].stem}_clone" + ("_together" if together else "")
+    stem = f"{raws[0].stem}_clone" + ("_together" if together is True else "")
     work = ROOT_EDITS / stem
     work.mkdir(parents=True, exist_ok=True)
     script = read_script(script_path) if script_path else None
-    takes = [analyze_take(r, k, together) for k, r in enumerate(raws)]
+    takes = [analyze_take(r, k, together is True) for k, r in enumerate(raws)]
+    if together == "auto":
+        together = same_hook(takes)
     if script:  # files in the wrong order? the script says who says what
         cov = lambda t, k: label_by_script(t["kept"], script, k)[1]
         if cov(takes[0], 1) + cov(takes[1], 0) > cov(takes[0], 0) + cov(takes[1], 1):
@@ -496,6 +516,76 @@ def gray_frames_all(src):
                           "-f", "rawvideo", "-"], capture_output=True).stdout
     k = len(out) // (TW * TH)
     return np.frombuffer(out[: k * TW * TH], np.uint8).reshape(k, TH, TW).astype(np.float32)
+
+
+# ---------- pairing a batch of AirDropped takes ----------
+PAIR_MINUTES = 20     # both halves of one video are filmed within this many minutes
+PAIR_EDGES = 0.80     # ceiling/headrest edge match: real pair 0.89, same car another day 0.65-0.68
+PAIR_SIDE = 2.0       # he must be on opposite sides (real pair 8.7)
+
+
+def shot_time(path):
+    try:
+        info = json.loads(E.sh([E.FP, "-v", "error", "-show_format", "-of", "json", str(path)]).stdout)
+        tags = info["format"].get("tags", {})
+        t = tags.get("com.apple.quicktime.creationdate") or tags.get("creation_time")
+        import datetime as dt
+        return dt.datetime.fromisoformat(t.replace("Z", "+00:00")).timestamp()
+    except Exception:
+        return Path(path).stat().st_mtime
+
+
+def key_thumbs(path, n=12):
+    """Gray thumbnails from keyframes only (fast on 4K HEVC)."""
+    out = subprocess.run([E.FF, "-v", "error", "-skip_frame", "nokey", "-i", str(path), "-map", "0:v:0",
+                          "-vf", f"scale={TW}:{TH},format=gray", "-fps_mode", "vfr", "-f", "rawvideo", "-"],
+                         capture_output=True).stdout
+    k = len(out) // (TW * TH)
+    if k == 0:
+        return None
+    f = np.frombuffer(out[: k * TW * TH], np.uint8).reshape(k, TH, TW).astype(np.float32)
+    return f[np.linspace(0, k - 1, min(n, k)).astype(int)]
+
+
+def edge_match(fa, fb):
+    """How well the fixed stuff (ceiling, headrests, windows) lines up: same mount = ~0.9."""
+    def edges(m):
+        gy, gx = np.gradient(blur(m, 1))
+        g = np.hypot(gx, gy)[: TH // 3]
+        return g - g.mean()
+    a, b = edges(np.median(fa, 0)), edges(np.median(fb, 0))
+    return float((a * b).sum() / np.sqrt((a * a).sum() * (b * b).sum() + 1e-9))
+
+
+def pair_takes(files):
+    """Sort by when they were filmed; pair neighbours that are the same shot with him on opposite
+    sides. Returns (pairs, leftovers with reasons). A random video never pairs."""
+    info = []
+    for f in files:
+        th = key_thumbs(f)
+        if th is not None:
+            info.append(dict(f=Path(f), t=shot_time(f), th=th))
+    info.sort(key=lambda x: x["t"])
+    pairs, left, i = [], [], 0
+    while i < len(info):
+        a = info[i]
+        if i + 1 < len(info):
+            b = info[i + 1]
+            gap = (b["t"] - a["t"]) / 60
+            em = edge_match(a["th"], b["th"])
+            side = person_side(a["th"], b["th"])
+            if gap <= PAIR_MINUTES and em >= PAIR_EDGES and abs(side) >= PAIR_SIDE:
+                pairs.append((a["f"], b["f"], dict(minutes=round(gap, 1), edges=round(em, 2), side=round(side, 1))))
+                i += 2
+                continue
+            why = (f"next clip filmed {gap:.0f} min later" if gap > PAIR_MINUTES else
+                   f"not the same shot as the next clip (edges {em:.2f})" if em < PAIR_EDGES else
+                   "same side as the next clip")
+        else:
+            why = "no partner clip"
+        left.append((a["f"], why))
+        i += 1
+    return pairs, left
 
 
 def seam_preview(out, seam, work):

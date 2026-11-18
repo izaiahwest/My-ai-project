@@ -7,7 +7,8 @@ Usage (on the Mac):
     python tools/edit.py raw/                         # everything in raw/ not yet edited
     python tools/edit.py raw/x.MOV --no-split         # don't split on claps
     python tools/edit.py --join raw/a.MOV raw/b.MOV   # several clips -> one video
-    python tools/edit.py --clone raw/a.MOV raw/b.MOV [--script s.txt] [--together]   # split-screen "two of me"
+    python tools/edit.py --clone raw/a.MOV raw/b.MOV [--script s.txt]   # split-screen "two of me"
+    python tools/edit.py --clone-batch raw/*.MOV                   # pair many takes, edit every pair
 
 For each raw file:
   1. Split on claps (one clap between videos) into separate takes.
@@ -573,20 +574,30 @@ def main():
     ap.add_argument("--clone", action="store_true",
                     help="two takes from a phone that didn't move -> one split-screen 'two of me' video")
     ap.add_argument("--script", help="(clone) text file, lines like 'A: ...' / 'B: ...' (A = first take)")
-    ap.add_argument("--together", action="store_true", help="(clone) both say the first line (hook) at the same time")
+    ap.add_argument("--together", action="store_true", help="(clone) force: both say the first line at once")
+    ap.add_argument("--no-together", action="store_true", help="(clone) force: normal back-and-forth hook")
+    ap.add_argument("--clone-batch", action="store_true",
+                    help="many clone takes at once: pair them by filming time + same shot, edit each pair")
     a = ap.parse_args()
     files = []
     for x in map(Path, a.inputs):
         files += sorted(p for p in x.iterdir() if p.suffix.lower() in VIDEO_EXT) if x.is_dir() else [x]
     (ROOT / "final").mkdir(exist_ok=True)
     summary = []
-    if a.clone:
+    together = True if a.together else False if a.no_together else "auto"
+    if a.clone or a.clone_batch:
         sys.modules.setdefault("edit", sys.modules[__name__])  # clone.py reuses this module
         import clone
-        try:
-            clone.process_clone(files, summary, a.script, a.together)
-        except Exception as e:
-            summary.append(f"- **clone {[f.name for f in files]}**: FAILED: {e}")
+        groups = [files]
+        if a.clone_batch:
+            pairs, left = clone.pair_takes(files)
+            groups = [[x, y] for x, y, _ in pairs]
+            summary += [f"- **{f.name}**: not edited ({why})" for f, why in left]
+        for g in groups:
+            try:
+                clone.process_clone(g, summary, a.script, together)
+            except Exception as e:
+                summary.append(f"- **clone {[f.name for f in g]}**: FAILED: {e}")
         files = []
     if a.join:
         try:

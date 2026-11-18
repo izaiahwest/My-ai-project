@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+"""AirDrop watcher: edits split-screen (clone) videos with nobody asking.
+
+Runs from launchd (~/Library/LaunchAgents/com.izaiahwest.clonewatch.plist) whenever
+~/Downloads changes, and every 3 minutes.
+  1. Looks at new videos in ~/Downloads (not screen recordings, portrait, 5 s - 10 min).
+  2. Waits until AirDrop is done (no new or growing file for 2 minutes).
+  3. Pairs takes: filmed within 20 min of each other + same shot (ceiling/headrest lines
+     match) + him on opposite sides. A random video never pairs, so it's never touched.
+  4. Moves each pair into raw/, edits it (clone.py; hook said together when both takes open
+     with the same line), puts the video in final/ AND iCloud Drive/TikTok Edits/, and pops a
+     Mac notification. Unpaired clips stay in Downloads; they're retried for 6 hours in case
+     the partner shows up, then ignored.
+Log: edits/watch.log. State: edits/watch_state.json.
+"""
+import datetime, fcntl, json, shutil, subprocess, sys, time, traceback
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import edit as E  # noqa: E402
+sys.modules["edit"] = E
+import clone as C  # noqa: E402
+
+DL = Path.home() / "Downloads"
+ICLOUD = Path.home() / "Library/Mobile Documents/com~apple~CloudDocs/TikTok Edits"
+STATE = E.ROOT / "edits" / "watch_state.json"
+LOCK = E.ROOT / "edits" / ".watch.lock"
+SETTLE = 120          # s with no new / growing file before starting
+GIVE_UP = 6 * 3600    # stop retrying an unpaired clip after this long
+
+
+def log(msg):
+    print(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} {msg}", flush=True)
+
+
+def notify(title, text):
+    subprocess.run(["osascript", "-e", f'display notification "{text}" with title "{title}"'],
+                   capture_output=True)
+
+
+def candidates(state):
+    out = []
+    for f in sorted(DL.iterdir()):
+        if f.suffix.lower() not in E.VIDEO_EXT or f.name.lower().startswith("screenrecording"):
+            continue
+        key = f"{f.name}:{f.stat().st_size}"
+        if key in state["ignored"] or key in state["used"]:
+            continue
+        out.append(f)
+    return out
+
+
+def looks_like_take(f):
+    """Portrait phone video, 5 s - 10 min."""
+    try:
+        info = json.loads(E.sh([E.FP, "-v", "error", "-select_streams", "v:0", "-show_entries",
+                                "stream=width,height:stream_side_data=rotation:format=duration",
+                                "-of", "json", str(f)]).stdout)
+        st = info["streams"][0]
+        w, h = st["width"], st["height"]
+        rot = abs(int(next((d.get("rotation", 0) for d in st.get("side_data_list", [])), 0)))
+        if rot in (90, 270):
+            w, h = h, w
+        return h > w and 5 <= float(info["format"]["duration"]) <= 600
+    except Exception:
+        return False
+
+
+def settled(files):
+    if not files:
+        return False
+    if time.time() - max(f.stat().st_mtime for f in files) < SETTLE:
+        return False
+    sizes = {f: f.stat().st_size for f in files}
+    time.sleep(5)
+    return all(f.exists() and f.stat().st_size == s for f, s in sizes.items())
+
+
+def into_raw(f):
+    dest = E.ROOT / "raw" / f.name
+    if dest.exists():
+        if dest.stat().st_size == f.stat().st_size:
+            f.unlink()          # same file AirDropped twice: use the copy we have
+            return dest
+        dest = dest.with_name(f"{f.stem}_{int(time.time())}{f.suffix}")
+    shutil.move(str(f), dest)
+    return dest
+
+
+def main():
+    (E.ROOT / "edits").mkdir(exist_ok=True)
+    lock = open(LOCK, "w")
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        return  # another run is already editing
+    state = json.loads(STATE.read_text()) if STATE.exists() else {"used": [], "ignored": [], "seen": {}}
+    files = [f for f in candidates(state) if looks_like_take(f)]
+    if not settled(files):
+        return
+    now = time.time()
+    for f in files:
+        state["seen"].setdefault(f"{f.name}:{f.stat().st_size}", now)
+    pairs, left = C.pair_takes(files)
+    log(f"{len(files)} new clip(s): {len(pairs)} pair(s), {len(left)} unpaired")
+    summary, made = [], []
+    for a, b, why in pairs:
+        keys = [f"{x.name}:{x.stat().st_size}" for x in (a, b)]
+        ra, rb = into_raw(a), into_raw(b)
+        state["used"] += keys
+        STATE.write_text(json.dumps(state, indent=1))
+        log(f"editing {ra.name} + {rb.name} {why}")
+        try:
+            n0 = len(summary)
+            C.process_clone([ra, rb], summary, None, "auto")
+            out = E.ROOT / "final" / f"{ra.stem}_clone.mp4"
+            if out.exists():
+                made.append(out)
+                ICLOUD.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(out, ICLOUD / out.name)
+            log("\n".join(summary[n0:]))
+        except Exception as e:
+            summary.append(f"- **clone {ra.name} + {rb.name}**: FAILED: {e}")
+            log(traceback.format_exc())
+    for f, why in left:
+        key = f"{f.name}:{f.stat().st_size}"
+        if now - state["seen"].get(key, now) > GIVE_UP:
+            state["ignored"].append(key)
+            log(f"ignoring {f.name} ({why}) after 6 h")
+        else:
+            log(f"left alone for now: {f.name} ({why})")
+    STATE.write_text(json.dumps(state, indent=1))
+    if summary:
+        day = datetime.date.today().isoformat()
+        sp = E.ROOT / "final" / f"SUMMARY-{day}.md"
+        head = "" if sp.exists() else f"# Edits {day}\n\n"
+        with sp.open("a") as fh:
+            fh.write(head + "\n".join(summary) + "\n")
+    if made:
+        flagged = sum("⚠️" in s for s in summary)
+        notify("Clone videos ready", f"{len(made)} edited" + (f", {flagged} to check" if flagged else "")
+               + " · iCloud Drive › TikTok Edits")
+
+
+if __name__ == "__main__":
+    main()

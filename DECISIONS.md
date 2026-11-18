@@ -28,3 +28,10 @@ Newest at the bottom. Format: date: decision (why).
 ## 2026-11-18: Clone mode approved after his first real test
 - He: "this is like exactly what I need… I like the overlay." Ask: tighter hand-offs, "back to back to back", no pauses between speakers. Done: line edges trimmed against each line's own voice level.
 - Some videos have both characters say the hook together. **He tells us when**; `--together` does it. Default: not together.
+
+## 2026-11-18: Clone style locked + auto-editing on
+- He: "YES THIS VERSION IS PERFECT… exactly what I need moving forward." Reference: final/IMG_1922_clone_together.mp4. Every clone video matches it.
+- Hook: said together automatically when both takes open with the same line; otherwise back-and-forth.
+- Workflow: two files per video (one per seat), alternating seats so each pair is filmed a minute apart; AirDrop a whole batch. Pairing by filming time + same shot + opposite sides, so random AirDrops are never edited.
+- Auto-edit on AirDrop turned on (launchd watcher, his OK). Finished videos also go to iCloud Drive › TikTok Edits.
+- Three-person clones: not built. Car = needs cut-out masking (back seat overlaps); home with 3 side-by-side spots = same seam method, 2 seams. After 2-person is running in volume.
