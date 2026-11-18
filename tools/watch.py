@@ -87,25 +87,28 @@ def into_raw(f):
     return dest
 
 
-def main():
-    (E.ROOT / "edits").mkdir(exist_ok=True)
-    lock = open(LOCK, "w")
-    try:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    except BlockingIOError:
-        return  # another run is already editing
-    state = json.loads(STATE.read_text()) if STATE.exists() else {"used": [], "ignored": [], "seen": {}}
-    state.setdefault("notified", [])
+_last = None
+
+
+def one_pass(state):
+    """Edit every pair that's ready. Returns how many videos were made (0 = nothing to do)."""
+    global _last
     files = [f for f in candidates(state) if looks_like_take(f)]
+    keys = sorted(f"{f.name}:{f.stat().st_size}" for f in files)
+    if keys == _last:   # nothing new since the last look (just leftovers waiting for a partner)
+        return 0
     if not settled(files):
-        return
+        return 0
+    _last = keys
     now = time.time()
     for f in files:
         state["seen"].setdefault(f"{f.name}:{f.stat().st_size}", now)
     pairs, left = C.pair_takes(files)
     log(f"{len(files)} new clip(s): {len(pairs)} pair(s), {len(left)} unpaired")
-    summary, made = [], []
-    for a, b, why in pairs:
+    if pairs:
+        notify("Editing clone videos", f"Got {len(files)} clip(s) → {len(pairs)} video(s). About 3–5 min each.")
+    summary, made = [], 0
+    for n, (a, b, why) in enumerate(pairs, 1):
         keys = [f"{x.name}:{x.stat().st_size}" for x in (a, b)]
         ra, rb = into_raw(a), into_raw(b)
         state["used"] += keys
@@ -116,13 +119,16 @@ def main():
             C.process_clone([ra, rb], summary, None, "auto")
             out = E.ROOT / "final" / f"{ra.stem}_clone.mp4"
             if out.exists():
-                made.append(out)
+                made += 1
                 ICLOUD.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(out, ICLOUD / out.name)
+                flag = " ⚠️ check this one" if any("⚠️" in x for x in summary[n0:]) else ""
+                notify(f"Video {n} of {len(pairs)} ready", f"{out.name}{flag} · iCloud Drive › TikTok Edits")
             log("\n".join(summary[n0:]))
         except Exception as e:
             summary.append(f"- **clone {ra.name} + {rb.name}**: FAILED: {e}")
             log(traceback.format_exc())
+            notify(f"Video {n} of {len(pairs)} failed", f"{ra.name} + {rb.name}. Message Claude.")
     stuck = []
     for f, why in left:
         key = f"{f.name}:{f.stat().st_size}"
@@ -145,10 +151,27 @@ def main():
             fh.write(head + "\n".join(summary) + "\n")
     if stuck:
         notify("Clips not edited", f"Couldn't pair {len(stuck)} new clip(s): {', '.join(stuck[:3])}. Message Claude.")
-    if made:
-        flagged = sum("⚠️" in s for s in summary)
-        notify("Clone videos ready", f"{len(made)} edited" + (f", {flagged} to check" if flagged else "")
-               + " · iCloud Drive › TikTok Edits")
+    return made
+
+
+def main():
+    (E.ROOT / "edits").mkdir(exist_ok=True)
+    lock = open(LOCK, "w")
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        return  # another run is already editing; it keeps checking for new AirDrops itself
+    state = json.loads(STATE.read_text()) if STATE.exists() else {"used": [], "ignored": [], "seen": {}}
+    state.setdefault("notified", [])
+    if not one_pass(state):
+        return
+    # He AirDrops a batch, goes back to filming, AirDrops more. Keep going: after each batch,
+    # watch Downloads for up to 15 more minutes and edit whatever arrives, without waiting for launchd.
+    quiet_since = time.time()
+    while time.time() - quiet_since < 15 * 60:
+        time.sleep(20)
+        if one_pass(state):
+            quiet_since = time.time()
 
 
 if __name__ == "__main__":
