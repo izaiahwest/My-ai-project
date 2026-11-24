@@ -41,3 +41,4 @@ Newest at the bottom. Format: date: decision (why).
 - **His rules now in code:** clone audio exactly as recorded (no normalize/limit/EQ/compression; only a 2 ms click guard at cuts, `declick_ms`); straight CapCut-style split, 10 px feather, default center, moves 35-65% per turn only to show a product; real listener footage (multiple real stretches before ever repeating; repeats get flagged); settings in `clone_settings.json`; QC measures lip-sync, frames, black/frozen, clipping, words, gaps, camera moved, split crossings.
 - Pacing kept at his approved back-to-back (`turn_gap_ms` 0); adjustable.
 - He doesn't need finished videos texted when we revise; delivery = iCloud Drive › TikTok Edits (+ shown in chat).
+- 2026-11-24: Today's products: Kodak Dock Plus, Bible in a Year for Kids, Kodak Mini 2 Retro. Film order by $/sale and momentum (FastMoss). Scripts in scripts/2026-11-24.md.
