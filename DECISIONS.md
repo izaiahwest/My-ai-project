@@ -45,3 +45,4 @@ Newest at the bottom. Format: date: decision (why).
 ## 2026-11-24: Brand outreach to JoeToys (joetoyss.com)
 - Iron Man helmets/suits maker (team of 7; Instagram @thearmorplace; info@joetoyss.com). He wants to make content for free because he loves the product.
 - Pitch: no fee; ask for 1 helmet (MK5 voice-activated, $179 on sale) + a tracked discount/affiliate code so his videos earn and they can see the sales. Gmail draft made, not sent; he fills in his handle and video links.
+- 2026-11-24 (update): Ask is "one product of your choice" + optional code/affiliate. Proof from FastMoss (estimates): Kodak Dock video 5.4M views, ~769 units; gloves 763K views, ~1,143 units. Channels: email + Instagram DM to @thearmorplace, plus ask @frankie_aka for a warm intro. Draft waits for his OK; after sending, one follow-up in 3 days if no reply, then stop.
