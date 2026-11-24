@@ -43,3 +43,4 @@ Newest at the bottom. Format: date: decision (why).
 - He doesn't need finished videos texted when we revise; delivery = iCloud Drive › TikTok Edits (+ shown in chat).
 - 2026-11-24: Today's products: Kodak Dock Plus, Bible in a Year for Kids, Kodak Mini 2 Retro. Film order by $/sale and momentum (FastMoss). Scripts in scripts/2026-11-24.md.
 - 2026-11-24: **Script bank** started (scripts/SCRIPT_BANK.md + claude.ai page). New scripts are highlighted yellow; older ones lose the highlight when the next batch lands (his ask). Talking head only for now, no clone (his phone situation). On-screen hook text is optional on these (his call, replaces 'no top text' for talking-head videos).
+- 2026-11-24: First script bank rejected ("sucked"). Rebuilt on his own 5.5M-view Kodak Dock script: double-meaning hook + native walkthrough. "Stick it in, choose a photo, print." is an approved hook. Variations swap the hook and the 'who it's for' line only. Old 11 scripts removed.
