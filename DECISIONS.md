@@ -41,3 +41,7 @@ Newest at the bottom. Format: date: decision (why).
 - **His rules now in code:** clone audio exactly as recorded (no normalize/limit/EQ/compression; only a 2 ms click guard at cuts, `declick_ms`); straight CapCut-style split, 10 px feather, default center, moves 35-65% per turn only to show a product; real listener footage (multiple real stretches before ever repeating; repeats get flagged); settings in `clone_settings.json`; QC measures lip-sync, frames, black/frozen, clipping, words, gaps, camera moved, split crossings.
 - Pacing kept at his approved back-to-back (`turn_gap_ms` 0); adjustable.
 - He doesn't need finished videos texted when we revise; delivery = iCloud Drive › TikTok Edits (+ shown in chat).
+
+## 2026-11-24: Brand outreach to JoeToys (joetoyss.com)
+- Iron Man helmets/suits maker (team of 7; Instagram @thearmorplace; info@joetoyss.com). He wants to make content for free because he loves the product.
+- Pitch: no fee; ask for 1 helmet (MK5 voice-activated, $179 on sale) + a tracked discount/affiliate code so his videos earn and they can see the sales. Gmail draft made, not sent; he fills in his handle and video links.
