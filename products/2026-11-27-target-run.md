@@ -21,3 +21,10 @@ Notes
 - #6 and #7 have more creators (Medium saturation). They're backups.
 - Near misses (more crowded or under 1K/7 d): Crayola Globbles (821 creators), Crayola Marker Airbrush (439), Shark Depuffi (681, beauty), Ninja BlendBOSS (2,247), LEGO Moana 2 barge (517/7 d), Spin Master Peekimo (750/7 d, 20% comm.).
 - Searched with no fit: Mattel, Fujifilm instax. Hot Wheels and Squishmallows only turned up resellers or knockoffs.
+
+## Follow-up (same day)
+- He bought the Crayola Touch Lights. Stanley Mini isn't at his Target. The LEGO commission is too low for him.
+- **Shark AW261: skip.** Barely sold (1–8 a day) until Nov 20, then 113–351 a day: a Black Friday spike. 51% of its sales come from ads and 17% from LIVE. New creators per day jumped from about 8 to 39, so the pile-on is already starting. He says TikTok Shop has only about 300 in stock, which at about 250 a day is gone in 1–2 days and leaves his videos with nothing to sell.
+- **Add: JBL Vibe Buds**, $29.90, 11% ≈ $3.29 a sale. 16,323 lifetime, 3,218 in 7 days, 315 creators. 66% of sales come from creator videos, so videos convert. Climbing: 11 a day on Nov 14, 673 on Nov 26. The $29.90 is likely a sale price. https://www.tiktok.com/shop/pdp/1732027914881438024
+- Looked at and passed on: Echo Dot 5th Gen (Best Buy shop; 97% of sales from the product card, about 1% from videos, and not sold at Target), Fire TV Stick ($1.60 a sale), Bloom frother, NeeDoh. No fit for Beats, Skullcandy, Bitzee, Magna-Tiles, Polaroid or Hydro Flask.
+- Toy and electronics searches with 8%+ commission were mostly no-name Shop brands that Target doesn't carry.
