@@ -28,3 +28,10 @@ Notes
 - **Add: JBL Vibe Buds**, $29.90, 11% ≈ $3.29 a sale. 16,323 lifetime, 3,218 in 7 days, 315 creators. 66% of sales come from creator videos, so videos convert. Climbing: 11 a day on Nov 14, 673 on Nov 26. The $29.90 is likely a sale price. https://www.tiktok.com/shop/pdp/1732027914881438024
 - Looked at and passed on: Echo Dot 5th Gen (Best Buy shop; 97% of sales from the product card, about 1% from videos, and not sold at Target), Fire TV Stick ($1.60 a sale), Bloom frother, NeeDoh. No fit for Beats, Skullcandy, Bitzee, Magna-Tiles, Polaroid or Hydro Flask.
 - Toy and electronics searches with 8%+ commission were mostly no-name Shop brands that Target doesn't carry.
+
+## Round 3: looser rules (he asked for anything that converts now, not only Target)
+- JBL Vibe Buds top sellers this week are faceless posts. Best one: 662.7K plays, 189 sales. FastMoss has 0 reviews for it.
+- Barsys Shaker Pro (smart cocktail shaker): $33.20, 10%, 4,736 in 7 d, 851 yesterday (above its 7-day average), 1,028 creators. https://www.tiktok.com/shop/pdp/1732424076336926771
+- ZipString Aracna: $36+, 12%, 5,218 in 7 d, 1,941 creators. Flat to slightly down. https://www.tiktok.com/shop/pdp/1731962330160534076
+- Passed: Herb scissors (16.7K in 7 d but 187 yesterday, so a promo spike), BrüMate, HydroJug, Bottle Buddy (2.6K–8.8K creators), Grab the Mic / Sorry What (4K+ creators).
+- Neither is confirmed at Target.
