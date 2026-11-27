@@ -1,4 +1,5 @@
 # Adding scripts to the bank
+0. Send the new scripts to Izaiah in chat first. Only add the ones he approves.
 1. In scripts/bank.json set every `"status": "new"` to `"bank"`.
 2. Append the new scripts with `"status": "new"` (fields: id, p, pay, who, from, lines; [brackets] = actions).
 3. Put new ones first, then run `python3 tools/build_script_bank.py "NEW · <Mon DD>"`.
