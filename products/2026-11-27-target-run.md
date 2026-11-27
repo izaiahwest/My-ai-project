@@ -35,3 +35,10 @@ Notes
 - ZipString Aracna: $36+, 12%, 5,218 in 7 d, 1,941 creators. Flat to slightly down. https://www.tiktok.com/shop/pdp/1731962330160534076
 - Passed: Herb scissors (16.7K in 7 d but 187 yesterday, so a promo spike), BrüMate, HydroJug, Bottle Buddy (2.6K–8.8K creators), Grab the Mic / Sorry What (4K+ creators).
 - Neither is confirmed at Target.
+
+## Round 4: other stores (Walmart, Dick's, Barnes & Noble)
+- No official Walmart or Dick's shop on TikTok Shop in FastMoss (only lookalike names).
+- **Ninja NeverDull 10-pc (NK12010)**, $200 at 5% = $10 a sale. Steady 185–313 a day (Nov 23–27). 43% of sales from videos, 35% from LIVE. New creators per day are rising fast (52 → 118), so the window is closing.
+- Owala FreeSip (Dick's / Target / Walmart): 1,720 in 7 d, 447 creators, about $2–3 a sale. OK, not great.
+- Barnes & Noble: nothing worth it. The "Jellycat" keychains are a reseller shop, not official Jellycat. The books that sell are TikTok-only editions.
+- BrüMate Müv: 2,276 creators (crowded). HydroJug Ease2o: 28 sold yesterday (fading).
