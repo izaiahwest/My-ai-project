@@ -9,9 +9,15 @@ d = json.load(open('scripts/bank.json'))
 COLORS = ['yellow', 'orange', 'pink', 'blue', 'green', 'purple']
 dates = sorted({s['added'] for s in d if s.get('added')})
 color = {dt: COLORS[i % len(COLORS)] for i, dt in enumerate(dates)}
-label = lambda dt: datetime.date.fromisoformat(dt).strftime('%b %-d')
+def label(dt):
+    # '2026-11-27' -> 'Nov 27'; '2026-11-27-2' -> 'Nov 27 · 2nd batch'
+    base = datetime.date.fromisoformat(dt[:10]).strftime('%b %-d')
+    return base + (f' · batch {dt[11:]}' if len(dt) > 10 else '')
+today = json.load(open('scripts/today.json')) if os.path.exists('scripts/today.json') else None
+tid = {i for g in today['groups'] for i in g['ids']} if today else set()
+byid = {s['id']: s for s in d}
 
-tabs = ['<button class="tab on" data-f="all" type="button">All</button>',
+tabs = (['<button class="tab" data-f="today" type="button">Film today</button>'] if today else []) + ['<button class="tab on" data-f="all" type="button">All</button>',
         '<button class="tab" data-f="proven" type="button">Proven</button>']
 tabs += [f'<button class="tab t-{color[dt]}" data-f="{dt}" type="button">{label(dt)}</button>' for dt in reversed(dates)]
 legend = ' '.join(f'<span class="key k-{color[dt]}">{label(dt)}</span>' for dt in reversed(dates))
@@ -26,7 +32,7 @@ for s in d:
         cls, f, badge = 'proven', 'proven', '<span class="badge b-proven">PROVEN · 5.5M</span>'
     else:
         dt = s['added']; cls, f, badge = f'c-{color[dt]}', dt, f'<span class="badge">{label(dt)}</span>'
-    out.append(f'<article class="card {cls}" data-f="{f}"><div class="top"><span class="id">{s["id"]}</span>{badge}</div>'
+    out.append(f'<article class="card {cls}" id="s-{s["id"]}" data-f="{f}" data-today="{1 if s["id"] in tid else 0}"><div class="top"><span class="id">{s["id"]}</span>{badge}</div>'
                f'<p class="who">{e(s["who"])}</p><ol>{lis}</ol><p class="from">{e(s["from"])} · {words} words</p></article>')
 
 CSS = """
@@ -60,6 +66,10 @@ h2{font-family:var(--display);font-size:1.2rem;margin:18px 0 0;display:flex;gap:
 ol{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:4px}
 li.act{color:var(--act);font-style:italic;list-style:none;margin-left:-1.4em}
 .from{margin:10px 0 0;font-size:.8rem;color:var(--muted)}
+.plan{background:var(--card);border:2px solid var(--fg);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.plan h2{margin:0}.plan h3{font-family:var(--display);font-size:1rem;margin:0}
+.plan ol{gap:2px}.plan a{color:var(--fg);font-weight:600}
+.plan ul{margin:4px 0 0;padding-left:1.2em;color:var(--muted);font-size:.9rem}
 """
 for c in COLORS:
     CSS += f".c-{c}{{background:var(--{c});border:2px solid var(--{c}-e)}}.c-{c} .badge{{border-color:var(--{c}-e)}}.k-{c}{{background:var(--{c});border-color:var(--{c}-e)}}.tab.t-{c}{{background:var(--{c})}}.tab.t-{c}.on{{border-color:var(--{c}-e)}}\n"
@@ -72,18 +82,27 @@ function show(f){
   var head=null,any=false;
   [].slice.call(document.querySelectorAll('main > h2, main > .card')).forEach(function(el){
     if(el.tagName==='H2'){if(head)head.hidden=!any;head=el;any=false;return;}
-    var vis=f==='all'||el.dataset.f===f; el.hidden=!vis; if(vis)any=true;
+    var vis=f==='all'||el.dataset.f===f||(f==='today'&&el.dataset.today==='1'); el.hidden=!vis; if(vis)any=true;
   });
   if(head)head.hidden=!any;
   try{localStorage.setItem('bank-tab',f);}catch(e){}
 }
 tabs.forEach(function(t){t.addEventListener('click',function(){show(t.dataset.f);});});
-var saved='all';try{saved=localStorage.getItem('bank-tab')||'all';}catch(e){}
+var saved=document.querySelector('.tab[data-f=today]')?'today':'all';try{saved=localStorage.getItem('bank-tab')||saved;}catch(e){}
 if(!tabs.some(function(t){return t.dataset.f===saved;}))saved='all';
 show(saved);
 })();
 </script>"""
 
+plan = ''
+if today:
+    gs = ''
+    for g in today['groups']:
+        items = ''.join(f'<li><a href="#s-{i}">{i}</a> · {e(byid[i]["p"])} · {e(byid[i]["who"].split(" · ")[0])}</li>' for i in g['ids'])
+        tips = ''.join(f'<li>{e(t)}</li>' for t in g['tips'])
+        gs += f'<div><h3>{e(g["who"])}</h3><ol>{items}</ol><ul>{tips}</ul></div>'
+    rules = ''.join(f'<li>{e(r)}</li>' for r in today['rules'])
+    plan = f'<section class="plan" aria-label="Film today"><h2>Film today · {label(today["date"])} <span class="pay">{e(today["goal"])}</span></h2>{gs}<ul>{rules}</ul></section>'
 page = f"""<title>WestFaveFinds Script Bank</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap">
@@ -91,6 +110,7 @@ page = f"""<title>WestFaveFinds Script Bank</title>
 <main>
 <h1>WestFaveFinds Script Bank</h1>
 <p class="lede">Your style: double-meaning hook, then a calm walkthrough. Film one, clap, film the next. Green lines are actions. Each day's batch has its own color: {legend}</p>
+{plan}
 <div class="tabs" role="group" aria-label="Show scripts from">{''.join(tabs)}</div>
 {chr(10).join(out)}
 <p class="from">Say "I actually just put it on sale" only when the sale is live. Keep hooks at this level; an explicit version can get the video restricted. Solo Stove: never light it in or right next to the car, and don't pick it up once it's lit. Never film while driving.</p>
@@ -99,6 +119,11 @@ page = f"""<title>WestFaveFinds Script Bank</title>
 open('scripts/script-bank.html', 'w').write(page)
 
 md = ['# Script bank · WestFaveFinds', '', 'Each batch is marked with its date. ✅ = proven. [Brackets] = actions.', '']
+if today:
+    md += [f"## Film today · {label(today['date'])} ({today['goal']})", '']
+    for g in today['groups']:
+        md += [f"**{g['who']}**", ''] + [f"{n}. {i} · {byid[i]['p']} · {byid[i]['who'].split(' · ')[0]}" for n, i in enumerate(g['ids'], 1)] + [''] + [f'- {t}' for t in g['tips']] + ['']
+    md += [f'- {r}' for r in today['rules']] + ['']
 cur = None
 for s in d:
     if s['p'] != cur: cur = s['p']; md += [f'## {cur} ({s["pay"]})', '']

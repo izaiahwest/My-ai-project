@@ -48,3 +48,4 @@ Newest at the bottom. Format: date: decision (why).
 - 2026-11-27: **Nothing goes into the script bank without his OK.** New scripts are sent to him in chat first; only approved ones get added (yellow).
 - 2026-11-27: Approved 5 edit-heavy formats (F1 car-to-fire, F2 snap build, F3 print passes, F4 print matches the view, F5 new print every line). Bank colors are now per date (Nov 24 yellow, Nov 27 orange) with date tabs (his ask).
 - 2026-11-27: Target-buyable product run done in the cloud with FastMoss (connected here via MCP; no login needed). Saved in products/2026-11-27-target-run.md. Target stock still has to be checked by hand or from the Mac session.
+- 2026-11-27: He OK'd adding tonight's scripts to the bank (Crayola C1–C6, Kodak K1–K2, Solo Stove SG for his girlfriend). The bank now opens on a 'Film today' list (scripts/today.json), split by who films where. Crayola goes first in the bank. Today's page: scripts/2026-11-27.md.

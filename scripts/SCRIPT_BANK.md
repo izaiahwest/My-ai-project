@@ -2,6 +2,123 @@
 
 Each batch is marked with its date. ✅ = proven. [Brackets] = actions.
 
+## Film today · Nov 27 (11 videos (10 if you skip K2))
+
+**You · in the car, parked**
+
+1. C1 · Crayola Mess-Free Touch Lights · Hook: "No markers. No paint. No mess."
+2. C2 · Crayola Mess-Free Touch Lights · Hook: "If you don't know what to get a toddler…"
+3. C3 · Crayola Mess-Free Touch Lights · A new drawing every line
+4. S1 · Solo Stove Lite · Hook: "Stick it in, light it up"
+5. S6 · Solo Stove Lite · Hook: "If the power goes out this winter…"
+
+- Never film while driving.
+- Play with the Crayola once before filming. Only say what it really does.
+
+**Her · basement**
+
+1. C4 · Crayola Mess-Free Touch Lights · Hook: "Turn the lights off and watch this"
+2. C6 · Crayola Mess-Free Touch Lights · Hook: "The most satisfying toy I've seen this year"
+3. C5 · Crayola Mess-Free Touch Lights · Hook: "I bought this for a toddler and now I can't put it down"
+4. K1 · Kodak Dock Plus · Hook: "If he never prints a picture of you two…"
+5. K2 · Kodak Dock Plus · Hook: "Every picture on this wall came out of this"
+6. SG · Solo Stove Lite · Hook: "If your man says he doesn't want anything…"
+
+- C4 and C6: lights off, phone on a stand, board flat on the table.
+- C5, K1, K2, SG: lamp on behind the phone so her face is lit.
+- Solo Stove stays unlit indoors.
+- K2 needs about 12 prints taped up first. Skip it if short on time.
+
+- Clap once between videos.
+- Mess up a line? Say it again. We cut the bad take.
+- AirDrop everything when done. Edits run overnight.
+
+## Crayola Mess-Free Touch Lights ($2/sale)
+
+**C1** · Nov 27 · batch 2 (pink) · Hook: "No markers. No paint. No mess." · Film: YOU, parked car · For: parents
+
+- [hold it up, drag a finger across so it lights up]
+- No markers. No paint. No mess.
+- They just touch it… and it lights up.
+- This is the Crayola Mess-Free Touch Lights, and it's made for toddlers.
+- [draw a smiley face]
+- Every line they draw lights up,
+- so nothing ends up on your walls, your couch, or your car seats.
+- Perfect for road trips, restaurants, or when you just need five minutes.
+- I already know it's gonna be one of the best gifts for little kids this year.
+- These are getting super popular, so if you're seeing this, now's your time.
+- I'll leave the link below.
+
+_Clean hook on purpose: no double meanings on a kids' toy._
+
+**C2** · Nov 27 · batch 2 (pink) · Hook: "If you don't know what to get a toddler…" · Film: YOU, parked car · For: aunts, uncles, last-minute buyers
+
+- If you don't know what to get a toddler for Christmas…
+- get them this.
+- [drag a finger, it lights up]
+- This is the Crayola Mess-Free Touch Lights.
+- They just touch it and it lights up. No markers, no paint, nothing to clean.
+- And it's Crayola, so you know they're gonna love it.
+- If you're the uncle or the aunt who never knows what to buy, this is the move.
+- One of the best gifts for little kids this year.
+- These are getting super popular, so now's your time. Link's below.
+
+_Speaks to the buyer, same move as Solo Stove S5._
+
+**C3** · Nov 27 · batch 2 (pink) · A new drawing every line · Film: YOU, parked car
+
+- [drawing 1: one glowing line] Touch it, and it lights up.
+- [drawing 2: smiley] No markers, no paint, no mess.
+- [drawing 3: heart] This is the Crayola Mess-Free Touch Lights.
+- [drawing 4: star] It's made for toddlers.
+- [drawing 5: a letter] Perfect for the car, nothing gets on the seats.
+- [drawing 6: Christmas tree] Best gift for little kids this year.
+- [drawing 7: arrow pointing down] Link's below.
+
+_Same idea as Kodak F5. Draw something new, say the line, draw the next thing. We hard-cut between them._
+
+**C4** · Nov 27 · batch 2 (pink) · Hook: "Turn the lights off and watch this" · Film: HER, basement, lights off
+
+- [lights on, board on the table]
+- Turn the lights off…
+- [flip the lights off]
+- and watch this.
+- [draw slowly so the lines glow]
+- This is the Crayola Mess-Free Touch Lights.
+- You just draw with your finger, and it lights up.
+- No markers, no paint, no mess on anything.
+- It's made for toddlers, but honestly I can't stop playing with it.
+- If you have a little one on your list this year, this is the gift.
+- These are getting super popular, so grab one now. Link's below.
+
+_The dark makes the lines pop. Phone on a stand, board flat, her hand in frame._
+
+**C5** · Nov 27 · batch 2 (pink) · Hook: "I bought this for a toddler and now I can't put it down" · Film: HER, basement, lamp on
+
+- I bought this for a toddler…
+- and now I can't put it down.
+- [draw, it lights up]
+- This is the Crayola Mess-Free Touch Lights.
+- They just touch it and it lights up, so there's no markers and no paint to clean up.
+- If you're done scrubbing crayon off the walls, this is for you.
+- It's made for toddlers, and it's Crayola, so you know it's good.
+- One of the best gifts for little kids this year.
+- Link's below.
+
+_Talking head, board in hand._
+
+**C6** · Nov 27 · batch 2 (pink) · Hook: "The most satisfying toy I've seen this year" · Film: HER, basement, lights off, close-up
+
+- [lights off, slow finger swirl]
+- This is the most satisfying toy I've seen this year.
+- [keep drawing, no talking for 2 seconds]
+- Crayola Mess-Free Touch Lights.
+- Made for toddlers. No markers, no paint, no mess.
+- Just touch it, and it lights up.
+- Perfect gift for the little ones. Link's below.
+
+_Short and slow. Let the glow carry it. 2 seconds of no talking is fine._
+
 ## Solo Stove Lite ($3/sale)
 
 **F1** · Nov 27 (orange) · Car to fire · Film: talking in the car + the outside fire clips
@@ -170,6 +287,21 @@ _Demo version. Let the fire do the talking._
 
 _ONLY film this if it really lights in the rain. Never under the trunk hatch._
 
+**SG** · Nov 27 · batch 2 (pink) · Hook: "If your man says he doesn't want anything…" · Film: HER, basement · UNLIT ONLY
+
+- If your man says he doesn't want anything for Christmas…
+- get him this.
+- [hold up the stove]
+- This is the Solo Stove Lite, the smallest one they make.
+- If he camps, hunts, fishes, or hikes, he's gonna want one.
+- It's only nine ounces, and it runs on sticks,
+- so he never has to buy propane.
+- It's on a crazy Black Friday sale right now,
+- so you're gonna look like you spent way more than you did.
+- Link's below.
+
+_S5 in her voice. Hold it unlit. Never light it indoors._
+
 ## Kodak Dock Plus ($16/sale)
 
 **P1** · ✅ proven · Original · 5.5M views
@@ -191,6 +323,37 @@ _ONLY film this if it really lights in the rain. Never under the trunk hatch._
 - I'm going to leave the link somewhere below in the video.
 
 _Your video, word for word. Re-post it in new spots (different car angle, a room at home) any time._
+
+**K1** · Nov 27 · batch 2 (pink) · Hook: "If he never prints a picture of you two…" · Film: HER, basement · For: girlfriends
+
+- If he never prints a single picture of you two…
+- print them yourself.
+- [phone onto the dock]
+- Stick it in, choose a photo, print,
+- and in seconds it's printed straight from your phone.
+- Fully laminated and smudge proof,
+- so they're going on the fridge, the mirror, everywhere.
+- This is the Kodak dock printer. You just download the Kodak app.
+- Comes with 50 sheets of photo paper, and even this adapter if you have an older phone.
+- Honestly one of the best Christmas gifts this year.
+- These are getting super popular, so if you're seeing this, now's your time.
+- Link's below.
+
+_Her opener, then your approved hook word for word._
+
+**K2** · Nov 27 · batch 2 (pink) · Hook: "Every picture on this wall came out of this" · Film: HER, basement wall
+
+- [camera on the wall of prints]
+- Every picture on this wall…
+- [pull back to the printer in her hand]
+- came out of this.
+- Stick it in, choose a photo, print, and in seconds you've got a real photo.
+- Fully laminated and smudge proof, so you can tape them up anywhere.
+- This is the Kodak dock printer. You just download the Kodak app.
+- Comes with 50 sheets of photo paper, so you can do a whole wall.
+- Best Christmas gift this year. Link's below.
+
+_Before filming: print about 12 photos and tape them to the wall. Start on the wall, then pull back to the printer._
 
 **F3** · Nov 27 (orange) · Watch the picture get made · Film: in the car, phone propped close to the printer, record the whole print
 

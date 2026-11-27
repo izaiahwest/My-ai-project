@@ -1,0 +1,42 @@
+{
+ "date": "2026-11-27",
+ "goal": "11 videos (10 if you skip K2)",
+ "groups": [
+  {
+   "who": "You \u00b7 in the car, parked",
+   "ids": [
+    "C1",
+    "C2",
+    "C3",
+    "S1",
+    "S6"
+   ],
+   "tips": [
+    "Never film while driving.",
+    "Play with the Crayola once before filming. Only say what it really does."
+   ]
+  },
+  {
+   "who": "Her \u00b7 basement",
+   "ids": [
+    "C4",
+    "C6",
+    "C5",
+    "K1",
+    "K2",
+    "SG"
+   ],
+   "tips": [
+    "C4 and C6: lights off, phone on a stand, board flat on the table.",
+    "C5, K1, K2, SG: lamp on behind the phone so her face is lit.",
+    "Solo Stove stays unlit indoors.",
+    "K2 needs about 12 prints taped up first. Skip it if short on time."
+   ]
+  }
+ ],
+ "rules": [
+  "Clap once between videos.",
+  "Mess up a line? Say it again. We cut the bad take.",
+  "AirDrop everything when done. Edits run overnight."
+ ]
+}
