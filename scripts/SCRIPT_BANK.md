@@ -1,10 +1,50 @@
 # Script bank · WestFaveFinds
 
-<mark>Yellow = NEW · Nov 27</mark>. [Brackets] = actions.
+Each batch is marked with its date. ✅ = proven. [Brackets] = actions.
 
 ## Solo Stove Lite ($3/sale)
 
-<mark>**S1** · Hook: "Stick it in, light it up" · Film: in the car, trunk open · For: winter car-kit people</mark>
+**F1** · Nov 27 (orange) · Car to fire · Film: talking in the car + the outside fire clips
+
+- [in the car, holding the stove and some sticks]
+- Stick it in, light it up…
+- [drop the sticks in → CUT to outside: sticks landing in the stove, the lighter, then the sped-up fire]
+- and in a couple minutes, you've got a real fire.
+- [back in the car]
+- This is the Solo Stove Lite, the smallest one they make.
+- It's only nine ounces, all stainless steel, and it runs on sticks.
+- No propane, no fuel canisters, nothing to buy.
+- I keep this in my trunk for winter,
+- so if I ever get stuck or the power goes out, I can boil water or heat up food.
+- [CUT to the big flames outside]
+- I paid fifty bucks for mine, and right now it's on a crazy Black Friday sale.
+- Perfect gift for the guy who has everything.
+- I'll leave the link below.
+
+_When you drop the sticks in the car, we cut to the same sticks landing in the stove outside. Fire clips come from your shot list._
+
+**F2** · Nov 27 (orange) · Snap and it's done · Film: outside, phone propped low, never touch it
+
+- [empty stove in the shot]
+- Stick it in…
+- [snap your fingers → then put the sticks in; we cut this part]
+- [stove full of sticks]
+- light it up…
+- [snap → then light it and let it catch; we cut this part]
+- [small flame]
+- give it a couple minutes…
+- [snap → wait until it's a big fire; keep recording; we cut the wait]
+- [big fire]
+- and that's a real fire, from sticks.
+- This is the Solo Stove Lite. Nine ounces, stainless steel, the smallest one they make.
+- No propane, no fuel. You can find sticks anywhere.
+- Camping, the backyard, or when the power goes out this winter.
+- I paid fifty bucks for mine, and right now it's on a crazy Black Friday sale.
+- Link's below.
+
+_"Snap" = snap your fingers with your hand in the shot. Keep recording the whole time. After each snap, do the next step; we cut that part out, so the stove jumps to the next stage on every snap._
+
+**S1** · Nov 27 (orange) · Hook: "Stick it in, light it up" · Film: in the car, trunk open · For: winter car-kit people
 
 - [hold the stove and a handful of sticks]
 - Stick it in, light it up…
@@ -22,7 +62,7 @@
 
 _Your double-meaning hook, and here it's literal: you stick sticks in. Nobody selling this does the car-kit angle._
 
-<mark>**S2** · Hook: "I paid fifty dollars for this…" · Film: in the car · For: deal hunters</mark>
+**S2** · Nov 27 (orange) · Hook: "I paid fifty dollars for this…" · Film: in the car · For: deal hunters
 
 - I paid fifty dollars for this…
 - and I'm kinda mad right now.
@@ -38,7 +78,7 @@ _Your double-meaning hook, and here it's literal: you stick sticks in. Nobody se
 
 _Price shock without saying the price (you can't). The anger is the hook._
 
-<mark>**S3** · Hook: "It's small… but it gets really hot" · Film: car or outside · For: campers</mark>
+**S3** · Nov 27 (orange) · Hook: "It's small… but it gets really hot" · Film: car or outside · For: campers
 
 - It's small…
 - but trust me, it gets really hot.
@@ -53,7 +93,7 @@ _Price shock without saying the price (you can't). The anger is the hook._
 
 _Same mechanic as your Retro size hook._
 
-<mark>**S4** · Hook: "Got wood?" · Film: outside, holding sticks · For: guys</mark>
+**S4** · Nov 27 (orange) · Hook: "Got wood?" · Film: outside, holding sticks · For: guys
 
 - Got wood?
 - [hold up a handful of sticks]
@@ -69,7 +109,7 @@ _Same mechanic as your Retro size hook._
 
 _Double meaning, then straight to the demo._
 
-<mark>**S5** · Hook: "The man who says he doesn't want anything…" · Film: in the car · For: wives/girlfriends buying for him</mark>
+**S5** · Nov 27 (orange) · Hook: "The man who says he doesn't want anything…" · Film: in the car · For: wives/girlfriends buying for him
 
 - If he says he doesn't want anything for Christmas…
 - get him this.
@@ -84,7 +124,7 @@ _Double meaning, then straight to the demo._
 
 _Speaks to the buyer, not the user. Gift season._
 
-<mark>**S6** · Hook: "If the power goes out this winter…" · Film: in the car · For: preppers and parents</mark>
+**S6** · Nov 27 (orange) · Hook: "If the power goes out this winter…" · Film: in the car · For: preppers and parents
 
 - If the power goes out this winter,
 - this is how I'm making coffee.
@@ -100,7 +140,7 @@ _Speaks to the buyer, not the user. Gift season._
 
 _Emergency angle. Only a few small creators tag #poweroutages, none film it from the car._
 
-<mark>**S7** · Hook: "Watch how fast this gets going" · Film: OUTSIDE when the rain stops · For: everybody</mark>
+**S7** · Nov 27 (orange) · Hook: "Watch how fast this gets going" · Film: OUTSIDE when the rain stops · For: everybody
 
 - Watch how fast this gets going.
 - [light it, hold on the flame for 2–3 seconds]
@@ -115,7 +155,7 @@ _Emergency angle. Only a few small creators tag #poweroutages, none film it from
 
 _Demo version. Let the fire do the talking._
 
-<mark>**S8** · Hook: "It's pouring and I'm still making a fire" · Film: outside, under a carport or porch roof · For: everybody</mark>
+**S8** · Nov 27 (orange) · Hook: "It's pouring and I'm still making a fire" · Film: outside, under a carport or porch roof · For: everybody
 
 - It's pouring outside…
 - and I'm still making a fire.
@@ -132,7 +172,7 @@ _ONLY film this if it really lights in the rain. Never under the trunk hatch._
 
 ## Kodak Dock Plus ($16/sale)
 
-**P1** · Original · 5.5M views ✅
+**P1** · ✅ proven · Original · 5.5M views
 
 - Stick it in, choose a photo, print,
 - and in seconds you have pictures printed directly from your phone.
@@ -152,7 +192,52 @@ _ONLY film this if it really lights in the rain. Never under the trunk hatch._
 
 _Your video, word for word. Re-post it in new spots (different car angle, a room at home) any time._
 
-**V1** · Hook: "Shove it in" · For: moms
+**F3** · Nov 27 (orange) · Watch the picture get made · Film: in the car, phone propped close to the printer, record the whole print
+
+- Stick it in, choose a photo, print.
+- [the paper goes in and out]
+- Watch, it goes in yellow…
+- then red… then blue…
+- then one more time to laminate it.
+- [finished print comes out, hold it up to the lens]
+- And that's why these are smudge proof.
+- This is the Kodak dock printer. You just download the Kodak app.
+- Comes with 50 sheets of photo paper, and even this adapter if you have an older phone.
+- I already know it's going to be one of the best Christmas gifts this year.
+- These are getting super popular, so if you're seeing this, now's your time.
+- Link's below.
+
+_Do one test print first and check that the paper goes in and out a few times. We speed it up and cut on each pass._
+
+**F4** · Nov 27 (orange) · The picture matches real life · Film: PARKED, phone propped on the dash or held steady
+
+- [print held up so it lines up perfectly with the windshield view]
+- Guess which one's the picture.
+- [1 second pause, then pull the print down so the real view shows behind it]
+- That one. I printed it right here in the car.
+- Stick it in, choose a photo, print, and in seconds it's in your hand.
+- Fully laminated and smudge proof.
+- This is the Kodak dock printer. You just download the Kodak app.
+- Comes with 50 sheets, so you can print a ton.
+- If you're always taking pictures on road trips, this is for you.
+- Best Christmas gift this year. Link's below.
+
+_Before filming: take a photo through the windshield from where the camera will be, and print it. The question is the hook: people stare to find the picture._
+
+**F5** · Nov 27 (orange) · A new picture every line · Film: in the car, print 8 photos first
+
+- [print 1] Stick it in, choose a photo, print.
+- [print 2] And in seconds, it's printed straight from your phone.
+- [print 3] Fully laminated and smudge proof.
+- [print 4] Now you don't have to go to the store anymore.
+- [print 5] This is the Kodak dock printer.
+- [print 6] It comes with 50 sheets of photo paper.
+- [print 7] Best Christmas gift this year.
+- [print 8] Link's below.
+
+_Say a line, swap to the next print, say the next line. We hard-cut between them._
+
+**V1** · Nov 24 (yellow) · Hook: "Shove it in" · For: moms
 
 - [push the phone onto the dock as you say it]
 - Shove it in, choose a photo, print,
@@ -170,7 +255,7 @@ _Your video, word for word. Re-post it in new spots (different car angle, a room
 
 _Your structure. Swaps the hook and the 'who it's for' line._
 
-**V2** · Hook: "Slide it in" · For: guys buying for their girl
+**V2** · Nov 24 (yellow) · Hook: "Slide it in" · For: guys buying for their girl
 
 - Slide it in, pick a picture, print,
 - and in seconds you've got a real photo straight from your phone.
@@ -186,7 +271,7 @@ _Your structure. Swaps the hook and the 'who it's for' line._
 
 _Same angle as this week's top Dock seller (a dad: 'get her what she wants', 354 sold in 7 days)._
 
-**V3** · Hook: "Is it in?" · For: couples
+**V3** · Nov 24 (yellow) · Hook: "Is it in?" · For: couples
 
 - Is it in?
 - Okay, it's in. Choose a photo, print,
@@ -202,7 +287,7 @@ _Same angle as this week's top Dock seller (a dad: 'get her what she wants', 354
 
 _Your structure, playful opener._
 
-**V4** · Hook: "Only takes a few seconds" · For: last-minute gift buyers
+**V4** · Nov 24 (yellow) · Hook: "Only takes a few seconds" · For: last-minute gift buyers
 
 - It only takes a few seconds…
 - and trust me, she's still gonna be happy.
@@ -218,7 +303,7 @@ _Your structure, playful opener._
 
 _Double meaning on 'it's quick'. Then straight into your demo._
 
-**V5** · Hook: "Don't worry, it fits" · For: people with older phones
+**V5** · Nov 24 (yellow) · Hook: "Don't worry, it fits" · For: people with older phones
 
 - Don't worry… it fits.
 - [hold up the adapter]
@@ -234,7 +319,7 @@ _Double meaning on 'it's quick'. Then straight into your demo._
 
 _Turns the adapter line into the hook._
 
-**V6** · Hook: "Put it in, pull it out" · For: vacation people
+**V6** · Nov 24 (yellow) · Hook: "Put it in, pull it out" · For: vacation people
 
 - Put it in, hit print,
 - [pull the photo out as it finishes]
@@ -251,7 +336,7 @@ _Turns the adapter line into the hook._
 
 _Double meaning lands on the print coming out. Your vacation line moves to the front._
 
-**V7** · Hook: "All the way in" · For: grandparents
+**V7** · Nov 24 (yellow) · Hook: "All the way in" · For: grandparents
 
 - Stick it in. Yeah, all the way.
 - Choose a photo, print,
@@ -267,7 +352,7 @@ _Double meaning lands on the print coming out. Your vacation line moves to the f
 
 _Gift for the person who always asks for pictures._
 
-**V8** · Hook: "Stick it in" + cancel the store trip · For: people who print at CVS or Walgreens
+**V8** · Nov 24 (yellow) · Hook: "Stick it in" + cancel the store trip · For: people who print at CVS or Walgreens
 
 - Stick it in, choose a photo, print.
 - Now cancel that trip to Walgreens.
@@ -282,7 +367,7 @@ _Gift for the person who always asks for pictures._
 
 _Your hook word for word, then your 'no more store' line as the second punch._
 
-**V9** · Hook: "Lay it down, stick it in" · For: scrapbookers
+**V9** · Nov 24 (yellow) · Hook: "Lay it down, stick it in" · For: scrapbookers
 
 - Lay it down, stick it in, choose a photo, print,
 - and in seconds you've got a real photo from your phone.
@@ -299,7 +384,7 @@ _Your structure; who-it's-for line changed._
 
 ## Kodak Mini 2 Retro ($8/sale)
 
-**R1** · Hook: "It's small, but…" · For: people on the go
+**R1** · Nov 24 (yellow) · Hook: "It's small, but…" · For: people on the go
 
 - It's small…
 - but it gets the job done.
@@ -315,7 +400,7 @@ _Your structure; who-it's-for line changed._
 
 _Your structure, with a double meaning on size._
 
-**R2** · Hook: "Size doesn't matter" · For: teen girls / scrapbook gift
+**R2** · Nov 24 (yellow) · Hook: "Size doesn't matter" · For: teen girls / scrapbook gift
 
 - They said size doesn't matter…
 - [hold it in your palm]

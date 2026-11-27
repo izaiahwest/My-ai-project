@@ -1,9 +1,61 @@
 [
  {
+  "id": "F1",
+  "p": "Solo Stove Lite",
+  "pay": "$3/sale",
+  "status": "bank",
+  "added": "2026-11-27",
+  "who": "Car to fire · Film: talking in the car + the outside fire clips",
+  "from": "When you drop the sticks in the car, we cut to the same sticks landing in the stove outside. Fire clips come from your shot list.",
+  "lines": [
+   "[in the car, holding the stove and some sticks]",
+   "Stick it in, light it up…",
+   "[drop the sticks in → CUT to outside: sticks landing in the stove, the lighter, then the sped-up fire]",
+   "and in a couple minutes, you've got a real fire.",
+   "[back in the car]",
+   "This is the Solo Stove Lite, the smallest one they make.",
+   "It's only nine ounces, all stainless steel, and it runs on sticks.",
+   "No propane, no fuel canisters, nothing to buy.",
+   "I keep this in my trunk for winter,",
+   "so if I ever get stuck or the power goes out, I can boil water or heat up food.",
+   "[CUT to the big flames outside]",
+   "I paid fifty bucks for mine, and right now it's on a crazy Black Friday sale.",
+   "Perfect gift for the guy who has everything.",
+   "I'll leave the link below."
+  ]
+ },
+ {
+  "id": "F2",
+  "p": "Solo Stove Lite",
+  "pay": "$3/sale",
+  "status": "bank",
+  "added": "2026-11-27",
+  "who": "Snap and it's done · Film: outside, phone propped low, never touch it",
+  "from": "\"Snap\" = snap your fingers with your hand in the shot. Keep recording the whole time. After each snap, do the next step; we cut that part out, so the stove jumps to the next stage on every snap.",
+  "lines": [
+   "[empty stove in the shot]",
+   "Stick it in…",
+   "[snap your fingers → then put the sticks in; we cut this part]",
+   "[stove full of sticks]",
+   "light it up…",
+   "[snap → then light it and let it catch; we cut this part]",
+   "[small flame]",
+   "give it a couple minutes…",
+   "[snap → wait until it's a big fire; keep recording; we cut the wait]",
+   "[big fire]",
+   "and that's a real fire, from sticks.",
+   "This is the Solo Stove Lite. Nine ounces, stainless steel, the smallest one they make.",
+   "No propane, no fuel. You can find sticks anywhere.",
+   "Camping, the backyard, or when the power goes out this winter.",
+   "I paid fifty bucks for mine, and right now it's on a crazy Black Friday sale.",
+   "Link's below."
+  ]
+ },
+ {
   "id": "S1",
   "p": "Solo Stove Lite",
   "pay": "$3/sale",
-  "status": "new",
+  "status": "bank",
   "who": "Hook: \"Stick it in, light it up\" · Film: in the car, trunk open · For: winter car-kit people",
   "from": "Your double-meaning hook, and here it's literal: you stick sticks in. Nobody selling this does the car-kit angle.",
   "lines": [
@@ -20,13 +72,14 @@
    "I paid fifty bucks for mine, and right now it's on a crazy Black Friday sale.",
    "Perfect gift for the guy who has everything.",
    "Link's below."
-  ]
+  ],
+  "added": "2026-11-27"
  },
  {
   "id": "S2",
   "p": "Solo Stove Lite",
   "pay": "$3/sale",
-  "status": "new",
+  "status": "bank",
   "who": "Hook: \"I paid fifty dollars for this…\" · Film: in the car · For: deal hunters",
   "from": "Price shock without saying the price (you can't). The anger is the hook.",
   "lines": [
@@ -41,13 +94,14 @@
    "Camping, hiking, power outage, it's all covered.",
    "If you've been waiting for this to go on sale, this is it.",
    "Link's below."
-  ]
+  ],
+  "added": "2026-11-27"
  },
  {
   "id": "S3",
   "p": "Solo Stove Lite",
   "pay": "$3/sale",
-  "status": "new",
+  "status": "bank",
   "who": "Hook: \"It's small… but it gets really hot\" · Film: car or outside · For: campers",
   "from": "Same mechanic as your Retro size hook.",
   "lines": [
@@ -61,13 +115,14 @@
    "Boil water, coffee, ramen, whatever.",
    "It's on a crazy Black Friday sale right now.",
    "Link's below."
-  ]
+  ],
+  "added": "2026-11-27"
  },
  {
   "id": "S4",
   "p": "Solo Stove Lite",
   "pay": "$3/sale",
-  "status": "new",
+  "status": "bank",
   "who": "Hook: \"Got wood?\" · Film: outside, holding sticks · For: guys",
   "from": "Double meaning, then straight to the demo.",
   "lines": [
@@ -82,13 +137,14 @@
    "Camping, hiking, or when the power goes out.",
    "It's on a crazy Black Friday sale right now.",
    "Perfect gift for him. Link's below."
-  ]
+  ],
+  "added": "2026-11-27"
  },
  {
   "id": "S5",
   "p": "Solo Stove Lite",
   "pay": "$3/sale",
-  "status": "new",
+  "status": "bank",
   "who": "Hook: \"The man who says he doesn't want anything…\" · Film: in the car · For: wives/girlfriends buying for him",
   "from": "Speaks to the buyer, not the user. Gift season.",
   "lines": [
@@ -102,13 +158,14 @@
    "It's on a crazy Black Friday sale right now,",
    "so you're gonna look like you spent way more than you did.",
    "Link's below."
-  ]
+  ],
+  "added": "2026-11-27"
  },
  {
   "id": "S6",
   "p": "Solo Stove Lite",
   "pay": "$3/sale",
-  "status": "new",
+  "status": "bank",
   "who": "Hook: \"If the power goes out this winter…\" · Film: in the car · For: preppers and parents",
   "from": "Emergency angle. Only a few small creators tag #poweroutages, none film it from the car.",
   "lines": [
@@ -123,13 +180,14 @@
    "It's the smallest Solo Stove they make, and it's on a crazy Black Friday sale.",
    "This is one of those things you want before you need it.",
    "Link's below."
-  ]
+  ],
+  "added": "2026-11-27"
  },
  {
   "id": "S7",
   "p": "Solo Stove Lite",
   "pay": "$3/sale",
-  "status": "new",
+  "status": "bank",
   "who": "Hook: \"Watch how fast this gets going\" · Film: OUTSIDE when the rain stops · For: everybody",
   "from": "Demo version. Let the fire do the talking.",
   "lines": [
@@ -143,13 +201,14 @@
    "Camping, the backyard, or when the power goes out.",
    "It's on a crazy Black Friday sale right now.",
    "Link's below."
-  ]
+  ],
+  "added": "2026-11-27"
  },
  {
   "id": "S8",
   "p": "Solo Stove Lite",
   "pay": "$3/sale",
-  "status": "new",
+  "status": "bank",
   "who": "Hook: \"It's pouring and I'm still making a fire\" · Film: outside, under a carport or porch roof · For: everybody",
   "from": "ONLY film this if it really lights in the rain. Never under the trunk hatch.",
   "lines": [
@@ -163,7 +222,8 @@
    "It's the smallest Solo Stove they make,",
    "and it's on a crazy Black Friday sale.",
    "Link's below."
-  ]
+  ],
+  "added": "2026-11-27"
  },
  {
   "id": "P1",
@@ -188,6 +248,70 @@
    "And these are already getting super popular.",
    "So if you're seeing this, now's your time to grab one.",
    "I'm going to leave the link somewhere below in the video."
+  ],
+  "added": null
+ },
+ {
+  "id": "F3",
+  "p": "Kodak Dock Plus",
+  "pay": "$16/sale",
+  "status": "bank",
+  "added": "2026-11-27",
+  "who": "Watch the picture get made · Film: in the car, phone propped close to the printer, record the whole print",
+  "from": "Do one test print first and check that the paper goes in and out a few times. We speed it up and cut on each pass.",
+  "lines": [
+   "Stick it in, choose a photo, print.",
+   "[the paper goes in and out]",
+   "Watch, it goes in yellow…",
+   "then red… then blue…",
+   "then one more time to laminate it.",
+   "[finished print comes out, hold it up to the lens]",
+   "And that's why these are smudge proof.",
+   "This is the Kodak dock printer. You just download the Kodak app.",
+   "Comes with 50 sheets of photo paper, and even this adapter if you have an older phone.",
+   "I already know it's going to be one of the best Christmas gifts this year.",
+   "These are getting super popular, so if you're seeing this, now's your time.",
+   "Link's below."
+  ]
+ },
+ {
+  "id": "F4",
+  "p": "Kodak Dock Plus",
+  "pay": "$16/sale",
+  "status": "bank",
+  "added": "2026-11-27",
+  "who": "The picture matches real life · Film: PARKED, phone propped on the dash or held steady",
+  "from": "Before filming: take a photo through the windshield from where the camera will be, and print it. The question is the hook: people stare to find the picture.",
+  "lines": [
+   "[print held up so it lines up perfectly with the windshield view]",
+   "Guess which one's the picture.",
+   "[1 second pause, then pull the print down so the real view shows behind it]",
+   "That one. I printed it right here in the car.",
+   "Stick it in, choose a photo, print, and in seconds it's in your hand.",
+   "Fully laminated and smudge proof.",
+   "This is the Kodak dock printer. You just download the Kodak app.",
+   "Comes with 50 sheets, so you can print a ton.",
+   "If you're always taking pictures on road trips, this is for you.",
+   "Best Christmas gift this year. Link's below."
+  ]
+ },
+ {
+  "id": "F5",
+  "p": "Kodak Dock Plus",
+  "pay": "$16/sale",
+  "status": "bank",
+  "added": "2026-11-27",
+  "who": "A new picture every line · Film: in the car, print 8 photos first",
+  "from": "Say a line, swap to the next print, say the next line. We hard-cut between them.",
+  "lines": [
+   "[print 1] Stick it in, choose a photo, print.",
+   "[print 2] And in seconds, it's printed straight from your phone.",
+   "[print 3] Fully laminated and smudge proof.",
+   "[print 4] Now you don't have to go to the store anymore.",
+   "[print 5] This is the Kodak dock printer.",
+   "[print 6] It comes with 50 sheets of photo paper.",
+   "[print 7] Best Christmas gift this year.",
+   "[print 8] Link's below."
   ]
  },
  {
@@ -211,7 +335,8 @@
    "Honestly one of the best Christmas gifts this year.",
    "These are getting super popular, so if you're seeing this, now's your time.",
    "I'll leave the link below."
-  ]
+  ],
+  "added": "2026-11-24"
  },
  {
   "id": "V2",
@@ -232,7 +357,8 @@
    "I already know it's one of the best Christmas gifts this year.",
    "These are getting super popular, so if you're seeing this, grab one now.",
    "Link's somewhere below."
-  ]
+  ],
+  "added": "2026-11-24"
  },
  {
   "id": "V3",
@@ -253,7 +379,8 @@
    "It's gonna be one of the best Christmas gifts this year.",
    "These are getting super popular, so now's your time.",
    "I'll leave the link below."
-  ]
+  ],
+  "added": "2026-11-24"
  },
  {
   "id": "V4",
@@ -274,7 +401,8 @@
    "and even this adapter if you have an older phone.",
    "These are getting super popular, so if you're seeing this, now's your time.",
    "Link's below."
-  ]
+  ],
+  "added": "2026-11-24"
  },
  {
   "id": "V5",
@@ -295,7 +423,8 @@
    "Comes with 50 sheets of photo paper, so you can print off a ton.",
    "Easily one of the best Christmas gifts this year.",
    "These are getting popular, so now's your time. Link below."
-  ]
+  ],
+  "added": "2026-11-24"
  },
  {
   "id": "V6",
@@ -317,7 +446,8 @@
    "One of the best Christmas gifts this year.",
    "These are getting super popular, so if you're seeing this, now's your time.",
    "Link's below."
-  ]
+  ],
+  "added": "2026-11-24"
  },
  {
   "id": "V7",
@@ -338,7 +468,8 @@
    "Even this adapter if you have an older phone.",
    "Best Christmas gift for grandparents this year.",
    "These are getting super popular. Link's below."
-  ]
+  ],
+  "added": "2026-11-24"
  },
  {
   "id": "V8",
@@ -358,7 +489,8 @@
    "I already know it's going to be one of the best Christmas gifts this year.",
    "These are getting super popular, so if you're seeing this, now's your time.",
    "Link's somewhere below."
-  ]
+  ],
+  "added": "2026-11-24"
  },
  {
   "id": "V9",
@@ -378,7 +510,8 @@
    "One of the best Christmas gifts this year for anybody crafty.",
    "These are getting super popular, so now's your time.",
    "Link's below."
-  ]
+  ],
+  "added": "2026-11-24"
  },
  {
   "id": "R1",
@@ -399,7 +532,8 @@
    "Comes with 38 sheets of photo paper.",
    "Perfect stocking stuffer this year.",
    "These are getting popular, so if you're seeing this, grab one. Link's below."
-  ]
+  ],
+  "added": "2026-11-24"
  },
  {
   "id": "R2",
@@ -419,6 +553,7 @@
    "If she scrapbooks or keeps a journal, this is the gift.",
    "Just download the Kodak app, and it comes with 38 sheets of photo paper.",
    "These are getting super popular. Link's below."
-  ]
+  ],
+  "added": "2026-11-24"
  }
 ]
