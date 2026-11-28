@@ -1,0 +1,234 @@
+<title>Clone Script Bank</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: phone-first list of scripts; tap one to open a full-screen reading view, A lines left, B lines right like the split screen. */
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --fg:#14171f; --muted:#5d6472; --line:#e1e4ea;
+  --a:#5b6578; --a-bg:#eceef3; --b:#d4362c; --b-bg:#fdecea; --ok:#1d7a4a; --ok-bg:#e2f4ea; --pk:#c2185b; --pk-bg:#fde7f0; --yl:#e0b000; --yl-bg:#fff6cc; --yl-fg:#7a5c00;
+  --display:"Archivo",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif;
+  --read:19px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1115; --surface:#171a21; --fg:#eceef3; --muted:#9aa2b2; --line:#272b35;
+  --a:#a6afc2; --a-bg:#20242d; --b:#ff6b5e; --b-bg:#2c1716; --ok:#5fd394; --ok-bg:#132a1e; --pk:#ff7eb3; --pk-bg:#2e1622; --yl:#f2c94c; --yl-bg:#2d2610; --yl-fg:#f2c94c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1115; --surface:#171a21; --fg:#eceef3; --muted:#9aa2b2; --line:#272b35;
+  --a:#a6afc2; --a-bg:#20242d; --b:#ff6b5e; --b-bg:#2c1716; --ok:#5fd394; --ok-bg:#132a1e; --pk:#ff7eb3; --pk-bg:#2e1622; --yl:#f2c94c; --yl-bg:#2d2610; --yl-fg:#f2c94c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:28px;font-weight:800;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:4px 0 0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,.card:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-weight:500;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.toggle{margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--muted);font-size:14px}
+details.formula{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin:14px 0;padding:0 16px}
+details.formula summary{padding:12px 0;font-weight:600;cursor:pointer}
+.beatrow{display:grid;grid-template-columns:64px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.beatrow .t{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+.beatrow b{display:block}
+.beatrow small{display:block;color:var(--muted)}
+.phr{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 14px;border-top:1px solid var(--line)}
+.phr span{background:var(--a-bg);border-radius:6px;padding:2px 8px;font-size:13px}
+.group{margin-top:22px}
+.group h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:8px}
+.list{display:grid;gap:8px}
+.card{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card .main{flex:1;min-width:0}
+.card .ttl{font-weight:600}
+.card.red{border:2px solid var(--b);background:var(--b-bg)}.card.red .ttl,h2.red{color:var(--b)}
+.card.pink{border:2px solid var(--pk);background:var(--pk-bg)}.card.pink .ttl,h2.pink{color:var(--pk)}.gstar{color:var(--ok)}
+.card.yellow{border:2px solid var(--yl);background:var(--yl-bg)}.card.yellow .ttl,h2.yellow{color:var(--yl-fg)}
+.card .cap{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{font-size:12px;font-weight:600;border-radius:6px;padding:2px 8px;background:var(--a-bg);color:var(--a);white-space:nowrap}
+.tag.done{background:var(--ok-bg);color:var(--ok)}
+.kind{display:inline-block;font-size:12px;font-weight:600;border-radius:6px;padding:1px 8px;margin:4px 0 2px}
+.kind.wfw{background:var(--ok-bg);color:var(--ok)}
+.kind.uni{background:var(--b-bg);color:var(--b)}
+.empty,.status{color:var(--muted);padding:24px 0}
+/* reader */
+.reader{position:fixed;inset:0;background:var(--bg);overflow-y:auto;z-index:20}
+.rtop{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:2;padding-top:env(safe-area-inset-top,0px)}
+.rtop .in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:8px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.rtop .sp{flex:1}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;font-weight:500;font-size:14px}
+.btn.on{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.rhead h2{font-size:24px;font-weight:800;margin-top:6px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.capbox{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:center}
+.capbox span{flex:1;min-width:0;font-size:14px;overflow-wrap:anywhere}
+.notes{margin-top:12px;background:var(--b-bg);border-radius:10px;padding:10px 14px;font-size:14px}
+.notes ul{margin:4px 0 0;padding-left:18px}
+.legend{display:flex;gap:16px;margin:18px 0 4px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.beat{margin-top:18px}
+.beat .ts{font-variant-numeric:tabular-nums;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.06em;border-bottom:1px solid var(--line);padding-bottom:4px;margin-bottom:10px}
+.ln{display:flex;flex-direction:column;margin:8px 0;font-size:var(--read);line-height:1.45}
+.ln .who{font-size:11px;font-weight:700;letter-spacing:.08em;margin-bottom:2px}
+.ln .txt{border-radius:12px;padding:10px 14px;max-width:88%}
+.ln.A{align-items:flex-start}.ln.A .who{color:var(--a)}.ln.A .txt{background:var(--a-bg)}
+.ln.B{align-items:flex-end}.ln.B .who{color:var(--b)}.ln.B .txt{background:var(--b-bg)}
+.ln.dir{align-items:center}.ln.dir .txt{font-style:italic;color:var(--muted);font-size:15px;border:1px dashed var(--line);background:transparent}
+em{font-style:normal;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:30}
+[hidden]{display:none!important}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}.tab{flex:1 1 140px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-weight:600;font-size:15px}
+.tab[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.spgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:10px 0 16px}
+.spb{text-align:left;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.spb b{display:block;font-size:15px}.spb span{font-size:13px;color:var(--muted)}
+.spb[aria-pressed="true"]{border:2px solid var(--b);background:var(--b-bg)}
+.no{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:10px;background:var(--a-bg);font-weight:700;font-size:14px}
+.nextbar{display:flex;gap:8px;justify-content:space-between;margin:24px 0 40px}
+@media (prefers-reduced-motion:no-preference){.card{transition:transform .12s}.card:active{transform:scale(.99)}}
+</style>
+
+<div class="wrap" id="home">
+  <h1>Clone Script Bank</h1>
+  <div class="tabs" id="tabs" hidden></div>
+  <p class="sub" id="count">Split-screen scripts, ready to record. A = losing clone, B = winning clone (your product).</p>
+  <p class="sub">⭐ = new &nbsp;·&nbsp; 📋 Word for word = copied from the original video &nbsp;·&nbsp; 💡 New angle = original idea</p>
+  <div class="bar" id="bar"></div>
+  <div class="bar" id="fmtbar"></div>
+  <div id="allonly">
+  <details class="formula" id="formula" hidden><summary>2-Person formula (Sarah + Keelz)</summary><div id="fbody"></div></details>
+  <details class="formula" id="formula4" hidden><summary>4-Person formula (chasefindz)</summary><div id="fbody4"></div></details>
+  </div>
+  <div id="groups"><p class="status" id="status">Loading scripts…</p></div>
+</div>
+<div class="reader" id="reader" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=s=>esc(s).replace(/\*(.+?)\*/g,"<em>$1</em>");
+let view="all",shootProd=null,scripts=[],format=null,format4=null,filter="All",fmtFilter="Any format",newOnly=false,hideFilmed=false,canWrite=false,db=null;
+try{view=localStorage.getItem("v")||"all";shootProd=localStorage.getItem("sp");filter=localStorage.getItem("f")||"All";fmtFilter=localStorage.getItem("ff")||"Any format";hideFilmed=localStorage.getItem("h")==="1";const r=localStorage.getItem("r");if(r)document.documentElement.style.setProperty("--read",r+"px")}catch(e){}
+function save(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(t._t);t._t=setTimeout(()=>t.hidden=true,1600)}
+
+function star(s){return s.proven?'<span class="gstar">★</span> ':s.isNew?"⭐ ":""}
+function kindTag(s){
+  if(s.kind==="word-for-word")return '<div class="kind wfw">📋 Word for word</div>';
+  if(s.kind==="unique")return '<div class="kind uni">💡 New angle</div>';
+  return "";
+}
+function products(){const m=new Map();scripts.forEach(s=>{if(!m.has(s.product))m.set(s.product,s.productOrder??99)});return [...m].sort((a,b)=>a[1]-b[1]).map(x=>x[0])}
+function cardHtml(s,lead){return `<button class="card${s.pink?" pink":s.yellow?" yellow":s.red?" red":""}" data-id="${esc(s.id)}">${lead?`<span class="no">${lead}</span>`:""}<div class="main"><div class="ttl">${star(s)}${esc(s.title)}</div>${kindTag(s)}<div class="cap">${esc(s.caption)}</div></div>`+
+  `${s.filmed?'<span class="tag done">Filmed</span>':`<span class="tag">${esc(s.style||"")}</span>`}</button>`}
+const shootDates=()=>[...new Set(scripts.filter(s=>s.shoot).map(s=>s.shoot))].sort().reverse();
+const curDate=()=>view.startsWith("shoot:")?view.slice(6):null;
+const shootList=()=>scripts.filter(s=>s.shoot&&s.shoot===curDate());
+function shootProducts(){const m=new Map();shootList().forEach(s=>{if(!m.has(s.product))m.set(s.product,s.shootOrder??99)});return [...m].sort((a,b)=>a[1]-b[1]).map(x=>x[0])}
+function renderTabs(){const ds=shootDates();const t=$("#tabs");t.hidden=!ds.length;if(!ds.length){view="all";return}
+  if(view==="shoot"||(view.startsWith("shoot:")&&!ds.includes(curDate())))view="shoot:"+ds[0];
+  const lbl=d=>new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+  t.innerHTML=`<button class="tab" data-v="all" aria-pressed="${view==="all"}">All scripts</button>`+ds.map(d=>`<button class="tab" data-v="shoot:${esc(d)}" aria-pressed="${view==="shoot:"+d}">🎬 Shoot Day · ${esc(lbl(d))}</button>`).join("")}
+function renderShoot(){
+  const ps=shootProducts(); if(!ps.includes(shootProd))shootProd=ps[0];
+  const sh=shootList(); const all=sh.length, done=sh.filter(s=>s.filmed).length;
+  $("#count").textContent=`${done} of ${all} filmed today. Pick a product and go top to bottom.`;
+  const items=sh.filter(s=>s.product===shootProd).sort((a,b)=>(a.shootNo??0)-(b.shootNo??0)).filter(s=>!(hideFilmed&&s.filmed));
+  $("#groups").innerHTML=`<div class="spgrid">${ps.map(p=>{const it=sh.filter(s=>s.product===p);const d=it.filter(s=>s.filmed).length;
+    return `<button class="spb" aria-pressed="${p===shootProd}" data-sp="${esc(p)}"><b>${esc(p)}</b><span>${d}/${it.length} filmed</span></button>`}).join("")}</div>
+    <label class="toggle" style="margin-bottom:10px"><input type="checkbox" id="hf" ${hideFilmed?"checked":""}> Hide filmed</label>
+    <div class="list">${items.map(s=>cardHtml(s,s.shootNo)).join("")||'<p class="empty">All filmed. Nice.</p>'}</div>`;
+}
+function renderHome(){
+  renderTabs(); const shoot=view.startsWith("shoot:");
+  $("#bar").hidden=shoot;$("#fmtbar").hidden=shoot;$("#allonly").hidden=shoot;
+  if(shoot&&scripts.length){renderShoot();return}
+  const ps=products(); if(filter!=="All"&&!ps.includes(filter))filter="All";
+  const filmed=scripts.filter(s=>s.filmed).length;
+  $("#count").textContent=scripts.length?`${scripts.length} scripts across ${ps.length} products · ${filmed} filmed. A = losing clone, B = winning clone (your product).`:"Split-screen scripts, ready to record.";
+  $("#bar").innerHTML=["All",...ps].map(p=>`<button class="chip" aria-pressed="${p===filter}" data-p="${esc(p)}">${esc(p)}</button>`).join("")+
+    `<label class="toggle"><input type="checkbox" id="hf" ${hideFilmed?"checked":""}> Hide filmed</label>`;
+  const fmtOf=s=>s.format||(s.winner?"4-Person":"2-Person");
+  const fmts=[...new Set(scripts.map(fmtOf))].sort();
+  if(fmtFilter!=="Any format"&&!fmts.includes(fmtFilter))fmtFilter="Any format";
+  $("#fmtbar").innerHTML=["Any format",...fmts].map(f=>`<button class="chip fchip" aria-pressed="${f===fmtFilter}" data-f="${esc(f)}">${esc(f)}</button>`).join("")+
+    (scripts.some(s=>s.isNew)?`<button class="chip nchip" aria-pressed="${newOnly}">⭐ New only</button>`:"");
+  if(!scripts.length)return;
+  let html="";
+  for(const p of ps){ if(filter!=="All"&&p!==filter)continue;
+    const items=scripts.filter(s=>s.product===p&&!(hideFilmed&&s.filmed)&&(fmtFilter==="Any format"||fmtOf(s)===fmtFilter)&&(!newOnly||s.isNew)).sort((a,b)=>(a.order??0)-(b.order??0));
+    if(!items.length)continue;
+    html+=`<section class="group"><h2>${esc(p)} · ${items.length}</h2><div class="list">`+items.map(s=>cardHtml(s)).join("")+`</div></section>`;
+  }
+  $("#groups").innerHTML=html||'<p class="empty">Everything here is filmed. Turn off “Hide filmed” to see them.</p>';
+}
+function renderFormula(){
+  if(!format)return; $("#formula").hidden=false;
+  $("#fbody").innerHTML=`<p class="sub" style="margin-bottom:10px">${esc(format.rule)}</p>`+(format.beats||[]).map(b=>
+    `<div class="beatrow"><div class="t">${esc(b.t)}</div><div><b>${esc(b.name)}</b><small>Sarah: ${esc(b.sarah)}</small><small>Keelz: ${esc(b.keelz)}</small></div></div>`).join("")+
+    `<div class="phr">${(format.phrases||[]).map(p=>`<span>${esc(p)}</span>`).join("")}</div>`;
+}
+function renderFormula4(){
+  if(!format4)return; $("#formula4").hidden=false;
+  $("#fbody4").innerHTML=`<p class="sub" style="margin-bottom:10px">${esc(format4.rule)}</p>`+(format4.beats||[]).map(b=>
+    `<div class="beatrow"><div class="t">${esc(b.t)}</div><div><b>${esc(b.name)}</b><small>${esc(b.ref)}</small></div></div>`).join("");
+}
+function openReader(id){
+  const s=scripts.find(x=>x.id===id); const r=$("#reader");
+  const nx=s&&s.shoot?scripts.filter(x=>x.shoot===s.shoot&&x.product===s.product&&(x.shootNo??0)>(s.shootNo??0)).sort((a,b)=>a.shootNo-b.shootNo)[0]:null;
+  if(!s){r.hidden=true;document.body.style.overflow="";return}
+  r.innerHTML=`<div class="rtop"><div class="in"><button class="btn" id="back">← ${s.shoot&&view.startsWith("shoot:")?"Shoot Day":"All scripts"}</button><span class="sp"></span>
+    <button class="btn" id="tm" aria-label="Smaller text">A−</button><button class="btn" id="tp" aria-label="Bigger text">A+</button>
+    ${canWrite?`<button class="btn ${s.filmed?"on":""}" id="fl">${s.filmed?"✓ Filmed":"Mark filmed"}</button>`:""}</div></div>
+    <div class="wrap"><div class="rhead"><div class="meta"><span class="tag">${esc(s.product)}</span><span class="tag">${esc(s.style||"")} style</span>${s.filmed?'<span class="tag done">Filmed</span>':""}</div>
+    <h2${s.pink?' class="pink"':s.yellow?' class="yellow"':s.red?' class="red"':""}>${star(s)}${esc(s.title)}</h2>${kindTag(s)}
+    <div class="capbox"><span><b>Caption:</b> ${esc(s.caption)}</span><button class="btn" id="cp">Copy</button></div>
+    ${(s.notes||[]).length?`<div class="notes"><b>Before you film</b><ul>${s.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>`:""}</div>
+    <div class="legend"${(s.beats||[]).some(b=>(b.lines||[]).some(l=>l.who==="A"||l.who==="B"))||s.winner?"":" hidden"}>${s.winner
+      ?`<span><i style="background:var(--a)"></i>The other clones</span><span><i style="background:var(--b)"></i>${esc(s.winner)} · your product</span>`
+      :`<span><i style="background:var(--a)"></i>A · loses</span><span><i style="background:var(--b)"></i>B · wins (your product)</span>`}</div>
+    ${(s.beats||[]).map(b=>`<div class="beat"><div class="ts">[${esc(b.t)}]</div>${(b.lines||[]).map(l=>{
+      if(l.who==="dir")return `<div class="ln dir"><div class="txt">(${fmt(l.text)})</div></div>`;
+      const win=l.who==="B"||(s.winner&&l.who===s.winner);
+      return `<div class="ln ${win?"B":"A"}"><div class="who">${esc(l.who==="Any"?"Anyone":l.who)}</div><div class="txt">${fmt(l.text)}</div></div>`}).join("")}</div>`).join("")}
+    ${nx?`<div class="nextbar">${canWrite&&!s.filmed?`<button class="btn" id="fl2">✓ Filmed, next</button>`:"<span></span>"}<button class="btn on" id="nx">Next: #${nx.shootNo} →</button></div>`:""}
+    </div>`;
+  r.hidden=false; document.body.style.overflow="hidden"; r.scrollTop=0;
+  $("#back").onclick=()=>{location.hash="";};
+  $("#cp").onclick=()=>{navigator.clipboard?.writeText(s.caption).then(()=>toast("Caption copied"),()=>toast("Select the caption to copy it"))};
+  const sz=d=>{const cur=parseInt(getComputedStyle(document.documentElement).getPropertyValue("--read"))||19;const n=Math.max(15,Math.min(30,cur+d));document.documentElement.style.setProperty("--read",n+"px");save("r",n)};
+  $("#tm").onclick=()=>sz(-2);$("#tp").onclick=()=>sz(2);
+  if(nx){$("#nx").onclick=()=>{location.hash="s-"+nx.id};const f2=$("#fl2");if(f2)f2.onclick=async()=>{f2.disabled=true;try{await db.doc("scripts/"+s.id).update({filmed:true})}catch(e){toast("Couldn't save. Try again.")}location.hash="s-"+nx.id}}
+  const fl=$("#fl"); if(fl)fl.onclick=async()=>{fl.disabled=true;try{await db.doc("scripts/"+s.id).update({filmed:!s.filmed});toast(s.filmed?"Marked not filmed":"Marked filmed")}catch(e){toast("Couldn't save. Try again.")}fl.disabled=false};
+}
+function route(){const h=location.hash.replace(/^#/,"");if(h.startsWith("s-"))openReader(h.slice(2));else{$("#reader").hidden=true;document.body.style.overflow=""}}
+window.addEventListener("hashchange",route);
+document.addEventListener("click",e=>{
+  const c=e.target.closest(".card");if(c){location.hash="s-"+c.dataset.id;return}
+  const tb=e.target.closest(".tab");if(tb){view=tb.dataset.v;save("v",view);renderHome();return}
+  const sb=e.target.closest(".spb");if(sb){shootProd=sb.dataset.sp;save("sp",shootProd);renderHome();return}
+  const nc=e.target.closest(".nchip");if(nc){newOnly=!newOnly;renderHome();return}
+  const fc=e.target.closest(".fchip");if(fc){fmtFilter=fc.dataset.f;save("ff",fmtFilter);renderHome();return}
+  const ch=e.target.closest(".chip");if(ch){filter=ch.dataset.p;save("f",filter);renderHome()}
+});
+document.addEventListener("change",e=>{if(e.target.id==="hf"){hideFilmed=e.target.checked;save("h",hideFilmed?"1":"0");renderHome()}});
+
+(async()=>{
+  db=await claude.use("db");
+  if(!db){$("#status").textContent="Open this page signed in to claude.ai to see the scripts.";return}
+  const user=await claude.use("user"); canWrite=user?(await user.isOwner()):false;
+  const timer=setTimeout(()=>{if(!scripts.length)$("#status").textContent="Can't reach the scripts yet. Check your connection."},10000);
+  db.collection("scripts").onSnapshot(snap=>{
+    if(!snap.metadata.fromCache)clearTimeout(timer);
+    scripts=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(!scripts.length&&!snap.metadata.fromCache)$("#groups").innerHTML='<p class="empty">No scripts yet. Ask Claude in chat to add some.</p>';
+    else renderHome();
+    if(!$("#reader").hidden||location.hash.startsWith("#s-"))route();
+  },e=>{clearTimeout(timer);$("#status").textContent="Couldn't load the scripts."});
+  db.doc("meta/format").onSnapshot(d=>{if(d.exists){format=d.data();renderFormula()}},()=>{});
+  db.doc("meta/format4").onSnapshot(d=>{if(d.exists){format4=d.data();renderFormula4()}},()=>{});
+})();
+renderHome();
+</script>
