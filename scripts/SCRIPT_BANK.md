@@ -2,174 +2,6 @@
 
 Each batch is marked with its date. ✅ = proven. [Brackets] = actions.
 
-## Solo Stove Lite ($3/sale)
-
-**F1** · Nov 27 (orange) · Car to fire · Film: talking in the car + the outside fire clips
-
-- [in the car, holding the stove and some sticks]
-- Stick it in, light it up…
-- [drop the sticks in → CUT to outside: sticks landing in the stove, the lighter, then the sped-up fire]
-- and in a couple minutes, you've got a real fire.
-- [back in the car]
-- This is the Solo Stove Lite, the smallest one they make.
-- It's only nine ounces, all stainless steel, and it runs on sticks.
-- No propane, no fuel canisters, nothing to buy.
-- I keep this in my trunk for winter,
-- so if I ever get stuck or the power goes out, I can boil water or heat up food.
-- [CUT to the big flames outside]
-- I paid fifty bucks for mine, and right now it's on a crazy Black Friday sale.
-- Perfect gift for the guy who has everything.
-- I'll leave the link below.
-
-_When you drop the sticks in the car, we cut to the same sticks landing in the stove outside. Fire clips come from your shot list._
-
-**F2** · Nov 27 (orange) · Snap and it's done · Film: outside, phone propped low, never touch it
-
-- [empty stove in the shot]
-- Stick it in…
-- [snap your fingers → then put the sticks in; we cut this part]
-- [stove full of sticks]
-- light it up…
-- [snap → then light it and let it catch; we cut this part]
-- [small flame]
-- give it a couple minutes…
-- [snap → wait until it's a big fire; keep recording; we cut the wait]
-- [big fire]
-- and that's a real fire, from sticks.
-- This is the Solo Stove Lite. Nine ounces, stainless steel, the smallest one they make.
-- No propane, no fuel. You can find sticks anywhere.
-- Camping, the backyard, or when the power goes out this winter.
-- I paid fifty bucks for mine, and right now it's on a crazy Black Friday sale.
-- Link's below.
-
-_"Snap" = snap your fingers with your hand in the shot. Keep recording the whole time. After each snap, do the next step; we cut that part out, so the stove jumps to the next stage on every snap._
-
-**S1** · Nov 27 (orange) · Hook: "Stick it in, light it up" · Film: in the car, trunk open · For: winter car-kit people
-
-- [hold the stove and a handful of sticks]
-- Stick it in, light it up…
-- [drop the sticks in]
-- and you've got a fire that fits in your hand.
-- This is the Solo Stove Lite, the smallest one they make.
-- Only nine ounces, all stainless steel,
-- and it runs on sticks. No propane, no fuel canisters.
-- I keep this in my car for winter,
-- so if I ever get stuck, I can boil water or cook with whatever sticks I find.
-- Outside only, never in the car.
-- I paid fifty bucks for mine, and right now it's on a crazy Black Friday sale.
-- Perfect gift for the guy who has everything.
-- Link's below.
-
-_Your double-meaning hook, and here it's literal: you stick sticks in. Nobody selling this does the car-kit angle._
-
-**S2** · Nov 27 (orange) · Hook: "I paid fifty dollars for this…" · Film: in the car · For: deal hunters
-
-- I paid fifty dollars for this…
-- and I'm kinda mad right now.
-- [show the stove]
-- This is the Solo Stove Lite, and it's on a crazy Black Friday sale right now.
-- I've seen it go for way more than I paid on Amazon.
-- It's the smallest Solo Stove they make.
-- Nine ounces, stainless steel,
-- and it runs on sticks. No propane, no fuel.
-- Camping, hiking, power outage, it's all covered.
-- If you've been waiting for this to go on sale, this is it.
-- Link's below.
-
-_Price shock without saying the price (you can't). The anger is the hook._
-
-**S3** · Nov 27 (orange) · Hook: "It's small… but it gets really hot" · Film: car or outside · For: campers
-
-- It's small…
-- but trust me, it gets really hot.
-- [hold it in your palm]
-- This is the Solo Stove Lite. Smallest one they make.
-- Nine ounces. Fits right in your bag.
-- You don't need propane or fuel canisters,
-- you just throw some sticks in and light it.
-- Boil water, coffee, ramen, whatever.
-- It's on a crazy Black Friday sale right now.
-- Link's below.
-
-_Same mechanic as your Retro size hook._
-
-**S4** · Nov 27 (orange) · Hook: "Got wood?" · Film: outside, holding sticks · For: guys
-
-- Got wood?
-- [hold up a handful of sticks]
-- Then you've got a fire.
-- Stick it in…
-- [drop them in, light it]
-- and that's it.
-- This is the Solo Stove Lite. Nine ounces, stainless steel,
-- and it runs on sticks, so you never have to buy fuel.
-- Camping, hiking, or when the power goes out.
-- It's on a crazy Black Friday sale right now.
-- Perfect gift for him. Link's below.
-
-_Double meaning, then straight to the demo._
-
-**S5** · Nov 27 (orange) · Hook: "The man who says he doesn't want anything…" · Film: in the car · For: wives/girlfriends buying for him
-
-- If he says he doesn't want anything for Christmas…
-- get him this.
-- [show the stove]
-- Solo Stove Lite. The smallest one they make.
-- Every guy who camps, hunts, fishes, or hikes is gonna want one.
-- It's only nine ounces, and it runs on sticks,
-- so he never has to buy propane.
-- It's on a crazy Black Friday sale right now,
-- so you're gonna look like you spent way more than you did.
-- Link's below.
-
-_Speaks to the buyer, not the user. Gift season._
-
-**S6** · Nov 27 (orange) · Hook: "If the power goes out this winter…" · Film: in the car · For: preppers and parents
-
-- If the power goes out this winter,
-- this is how I'm making coffee.
-- [show the stove]
-- Solo Stove Lite. It runs on sticks,
-- so no propane, no fuel, no power needed.
-- Nine ounces, it lives in my trunk.
-- Boil water, heat up food, whatever you need.
-- Outside only.
-- It's the smallest Solo Stove they make, and it's on a crazy Black Friday sale.
-- This is one of those things you want before you need it.
-- Link's below.
-
-_Emergency angle. Only a few small creators tag #poweroutages, none film it from the car._
-
-**S7** · Nov 27 (orange) · Hook: "Watch how fast this gets going" · Film: OUTSIDE when the rain stops · For: everybody
-
-- Watch how fast this gets going.
-- [light it, hold on the flame for 2–3 seconds]
-- Just sticks. That's it.
-- This is the Solo Stove Lite.
-- It burns so hot it barely smokes.
-- [pick it up by the bottom edge only if it's cool enough, or point at it]
-- Nine ounces, stainless steel, and you never buy fuel.
-- Camping, the backyard, or when the power goes out.
-- It's on a crazy Black Friday sale right now.
-- Link's below.
-
-_Demo version. Let the fire do the talking._
-
-**S8** · Nov 27 (orange) · Hook: "It's pouring and I'm still making a fire" · Film: outside, under a carport or porch roof · For: everybody
-
-- It's pouring outside…
-- and I'm still making a fire.
-- [light it, show the flame with rain in the background]
-- This is the Solo Stove Lite.
-- Nine ounces, runs on sticks,
-- no propane, no fuel canisters.
-- Now I've got hot water for coffee in the rain.
-- It's the smallest Solo Stove they make,
-- and it's on a crazy Black Friday sale.
-- Link's below.
-
-_ONLY film this if it really lights in the rain. Never under the trunk hatch._
-
 ## Kodak Dock Plus ($16/sale)
 
 **P1** · ✅ proven · Original · 5.5M views
@@ -191,6 +23,23 @@ _ONLY film this if it really lights in the rain. Never under the trunk hatch._
 - I'm going to leave the link somewhere below in the video.
 
 _Your video, word for word. Re-post it in new spots (different car angle, a room at home) any time._
+
+**K1** · Nov 28 (pink) · Hook: "It goes in and out… four times" · Film: car, phone propped close to the printer
+
+- [paper starts going into the printer]
+- It goes in and out…
+- four times.
+- [let one pass happen on camera]
+- And every time it comes back out, there's a new color.
+- Then the last pass laminates it, so it's smudge proof.
+- [finished print comes out, hold it up to the lens]
+- Stick it in, choose a photo, print.
+- This is the Kodak dock printer. You just download the Kodak app.
+- Comes with 50 sheets of photo paper, and even this adapter for older phones.
+- Best Christmas gift this year. These are getting super popular,
+- so if you're seeing this, now's your time. Link's below.
+
+_Film: car, phone propped close to the printer. Do a test print first and count the passes. If it isn't 4, change the number. P1, V2, V4, F4 are already in your bank. Same words. For every demo: you say the English line, then **stop talking** and let the device speak. If nobody's with you for the answer, say the Spanish line yourself or play it from your phone._
 
 **F3** · Nov 27 (orange) · Watch the picture get made · Film: in the car, phone propped close to the printer, record the whole print
 
@@ -381,6 +230,372 @@ _Your hook word for word, then your 'no more store' line as the second punch._
 - Link's below.
 
 _Your structure; who-it's-for line changed._
+
+## AI Voice Translator (ZNP Z06) ($3.60/sale)
+
+**T1** · Nov 28 (pink) · Hook: "It's small… and it goes both ways" · Film: car
+
+- [hold it up to the lens]
+- It's small…
+- and it goes both ways.
+- This is a two-way AI translator, and it talks in your own voice.
+- Hit the mic in the middle and just talk.
+- [say:] Hey, how's it going?
+- [let it speak the Spanish, in your voice]
+- And when they answer in Spanish…
+- [say, or play from your phone:] Muy bien, ¿y tú?
+- [let it speak the English]
+- it hears which language it is and flips it automatically.
+- No tapping back and forth like on your phone.
+- A hundred sixty-five languages, works offline, and there's no subscription.
+- Magnetic on the back, so it sticks to your phone or clips on your shirt.
+- Over three thousand people grabbed one last week,
+- so if you're seeing this, now's your time.
+- I'll leave the link below.
+
+_Your double-meaning style. Literal too: it's two-way._
+
+**T2** · Nov 28 (pink) · Hook: "Stick it on, hit the button, and talk" · Film: car
+
+- [stick it on the back of your phone]
+- Stick it on, hit the button, and talk.
+- [say:] Where's the closest gas station?
+- [let it speak the Spanish, in your voice]
+- That's my voice. In Spanish.
+- This is an AI translator with a hundred sixty-five languages,
+- and it's two-way, so when they answer back, it translates that too.
+- Totally hands-free. You don't have to keep switching like on your phone.
+- Works offline, no subscription,
+- and it comes with a chain so you can wear it like a necklace.
+- If you know somebody who travels, this is the gift.
+- These are going fast for the holidays. Link's below.
+
+_Same rhythm as your 5.5M hook._
+
+**T3** · Nov 28 (pink) · Hook: "Ever wonder what you'd sound like in Japanese?" · Film: car
+
+- Ever wonder what you'd sound like in Japanese?
+- [say:] What's up y'all, I hope you're having a good day.
+- [let it speak the Japanese, in your voice. Don't talk over it.]
+- Yeah. That's me.
+- This is an AI translator, and it speaks a hundred sixty-five languages in your own voice.
+- And it's two-way, so it translates them back to you too, hands-free.
+- Works offline, no subscription,
+- magnetic on the back so it sticks right on your phone.
+- Comment a language and I'll make it say something in that one next.
+- Link's below.
+
+_Built from the top sellers for this product (see swipes, Nov 28)._
+
+**T4** · Nov 28 (pink) · Hook: "I don't speak a word of Spanish… but listen" · Film: car
+
+- I don't speak a word of Spanish…
+- but listen.
+- [say:] I'm gonna be honest, I have no idea what I'm saying right now.
+- [let it speak the Spanish, in your voice]
+- This little thing just did all the talking for me, in my voice.
+- It's an AI translator, a hundred sixty-five languages,
+- and it picks up when the other person switches languages, so you never touch it.
+- Works offline, no subscription.
+- Magnetic back, clips on your shirt, or wear it on the chain.
+- Perfect for trips, work, whatever.
+- Link's below.
+
+_Built from the top sellers for this product (see swipes, Nov 28)._
+
+**T5** · Nov 28 (pink) · Hook: "If your girlfriend's parents don't speak English…" · Film: car
+
+- If your girlfriend's parents don't speak English…
+- this is how you finally get them to like you.
+- [hold it up]
+- It's an AI translator, and it talks in your own voice.
+- [say:] It's so nice to finally meet you. Your daughter talks about you all the time.
+- [let it speak the Spanish, in your voice]
+- And when they answer back, it translates it to English for you.
+- No phone, no typing, no awkward silence.
+- A hundred sixty-five languages, works offline, no subscription.
+- Trust me, you need this before Christmas dinner.
+- Link's below.
+
+_Built from the top sellers for this product (see swipes, Nov 28)._
+
+**T6** · Nov 28 (pink) · Hook: "Comment your language" · Film: car
+
+- Comment your language,
+- and I'll make this say something in it, in my voice.
+- [hold it up]
+- This is an AI translator with a hundred sixty-five languages.
+- Watch.
+- [say:] Thank you for watching, have a great day.
+- [let it speak French, in your voice]
+- That's my voice in French.
+- And it's two-way, so it translates them back to me too, hands-free.
+- Works offline, no subscription, magnetic on the back.
+- Drop your language below, and I'll do yours next.
+- Link's below too.
+
+_Every comment can become its own "Replying to @…" video, so this one turns into a whole series._
+
+**T7** · Nov 28 (pink) · Hook: "If you work with customers who don't speak English…" · Film: car
+
+- If you work with customers who don't speak English,
+- nurses, contractors, drive-thru, retail,
+- you need this.
+- [hold it up]
+- It's a two-way AI translator, and it talks in your own voice.
+- [say:] How can I help you today?
+- [let it speak the Spanish, in your voice]
+- When they answer, it switches by itself and gives you the English.
+- Hands-free, so you can keep working.
+- Clips right on your shirt, works offline, no subscription.
+- A hundred sixty-five languages.
+- Over three thousand sold last week. Link's below.
+
+_Chase's best seller (858 sold) is the medical-worker version. This widens it to jobs your viewers have._
+
+## Crayola Mess-Free Touch Lights ($2.05/sale)
+
+**C1** · Nov 28 (pink) · Hook: "This is how you win Christmas with a toddler" · Film: car
+
+- If you've got a toddler on your list,
+- this is how you win Christmas.
+- [hold it up, touch the screen so it lights up]
+- It's the Crayola Mess-Free Touch Lights.
+- There's gel inside, so they just draw with their finger,
+- and it lights up in a bunch of colors.
+- [draw something]
+- Flip the switch on the back, and it plays songs while they draw.
+- And when they're done, it goes right back to blank.
+- No markers, no paint, nothing to clean.
+- These are selling out fast. Link's below.
+
+_Built from the top sellers for this product (see swipes, Nov 28)._
+
+**C2** · Nov 28 (pink) · Hook: "Finger painting… with nothing to clean up" · Film: car
+
+- Finger painting…
+- [draw on it, it lights up]
+- with nothing to clean up.
+- This is the Crayola Mess-Free Touch Lights.
+- Toddlers just press their finger in the gel and it lights up.
+- Different colors, and there's a music mode on the back too.
+- It goes back to blank, so they can draw over and over.
+- No paint on the couch, no marker on the walls.
+- Perfect Christmas gift for a little one. Link's below.
+
+_Built from the top sellers for this product (see swipes, Nov 28)._
+
+**C3** · Nov 28 (pink) · Hook: "If your toddler hates car rides…" · Film: car
+
+- If your toddler hates car rides…
+- [hold it up in the back seat]
+- this is gonna save you.
+- It's the Crayola Mess-Free Touch Lights.
+- They draw with their finger, it lights up, and nothing gets on your seats.
+- [draw on it]
+- There's a music mode on the back, so it plays songs too.
+- Car rides, restaurants, the doctor's office, it goes everywhere.
+- These are selling out quick before Christmas.
+- Link's below.
+
+_You're already in the car, so nobody else can film this one as easily._
+
+**C4** · Nov 28 (pink) · Hook: "Instead of handing them your phone…" · Film: car
+
+- Instead of handing your toddler your phone…
+- [hold it up]
+- hand them this.
+- It's the Crayola Mess-Free Touch Lights.
+- No screen. They draw with their finger, and the gel lights up.
+- [draw on it]
+- Flip the switch, and they've got music while they draw.
+- Totally mess-free, and it goes back to blank.
+- It keeps them busy, and it's not YouTube.
+- Great Christmas gift. Link's below.
+
+_Built from the top sellers for this product (see swipes, Nov 28)._
+
+**C5** · Nov 28 (pink) · Hook: "If you've got a sensory kid…" · Film: car
+
+- If you're shopping for a sensory kid,
+- you're gonna want to see this.
+- [press into the gel so it lights up]
+- It's squishy gel, and it lights up wherever they touch.
+- This is the Crayola Mess-Free Touch Lights.
+- Different colors, a music mode,
+- and it goes back to blank so they can keep going.
+- No mess at all.
+- These are going fast for Christmas. Link's below.
+
+_Built from the top sellers for this product (see swipes, Nov 28)._
+
+## Solo Stove Lite ($3/sale)
+
+**F1** · Nov 27 (orange) · Car to fire · Film: talking in the car + the outside fire clips
+
+- [in the car, holding the stove and some sticks]
+- Stick it in, light it up…
+- [drop the sticks in → CUT to outside: sticks landing in the stove, the lighter, then the sped-up fire]
+- and in a couple minutes, you've got a real fire.
+- [back in the car]
+- This is the Solo Stove Lite, the smallest one they make.
+- It's only nine ounces, all stainless steel, and it runs on sticks.
+- No propane, no fuel canisters, nothing to buy.
+- I keep this in my trunk for winter,
+- so if I ever get stuck or the power goes out, I can boil water or heat up food.
+- [CUT to the big flames outside]
+- I paid fifty bucks for mine, and right now it's on a crazy Black Friday sale.
+- Perfect gift for the guy who has everything.
+- I'll leave the link below.
+
+_When you drop the sticks in the car, we cut to the same sticks landing in the stove outside. Fire clips come from your shot list._
+
+**F2** · Nov 27 (orange) · Snap and it's done · Film: outside, phone propped low, never touch it
+
+- [empty stove in the shot]
+- Stick it in…
+- [snap your fingers → then put the sticks in; we cut this part]
+- [stove full of sticks]
+- light it up…
+- [snap → then light it and let it catch; we cut this part]
+- [small flame]
+- give it a couple minutes…
+- [snap → wait until it's a big fire; keep recording; we cut the wait]
+- [big fire]
+- and that's a real fire, from sticks.
+- This is the Solo Stove Lite. Nine ounces, stainless steel, the smallest one they make.
+- No propane, no fuel. You can find sticks anywhere.
+- Camping, the backyard, or when the power goes out this winter.
+- I paid fifty bucks for mine, and right now it's on a crazy Black Friday sale.
+- Link's below.
+
+_"Snap" = snap your fingers with your hand in the shot. Keep recording the whole time. After each snap, do the next step; we cut that part out, so the stove jumps to the next stage on every snap._
+
+**S1** · Nov 27 (orange) · Hook: "Stick it in, light it up" · Film: in the car, trunk open · For: winter car-kit people
+
+- [hold the stove and a handful of sticks]
+- Stick it in, light it up…
+- [drop the sticks in]
+- and you've got a fire that fits in your hand.
+- This is the Solo Stove Lite, the smallest one they make.
+- Only nine ounces, all stainless steel,
+- and it runs on sticks. No propane, no fuel canisters.
+- I keep this in my car for winter,
+- so if I ever get stuck, I can boil water or cook with whatever sticks I find.
+- Outside only, never in the car.
+- I paid fifty bucks for mine, and right now it's on a crazy Black Friday sale.
+- Perfect gift for the guy who has everything.
+- Link's below.
+
+_Your double-meaning hook, and here it's literal: you stick sticks in. Nobody selling this does the car-kit angle._
+
+**S2** · Nov 27 (orange) · Hook: "I paid fifty dollars for this…" · Film: in the car · For: deal hunters
+
+- I paid fifty dollars for this…
+- and I'm kinda mad right now.
+- [show the stove]
+- This is the Solo Stove Lite, and it's on a crazy Black Friday sale right now.
+- I've seen it go for way more than I paid on Amazon.
+- It's the smallest Solo Stove they make.
+- Nine ounces, stainless steel,
+- and it runs on sticks. No propane, no fuel.
+- Camping, hiking, power outage, it's all covered.
+- If you've been waiting for this to go on sale, this is it.
+- Link's below.
+
+_Price shock without saying the price (you can't). The anger is the hook._
+
+**S3** · Nov 27 (orange) · Hook: "It's small… but it gets really hot" · Film: car or outside · For: campers
+
+- It's small…
+- but trust me, it gets really hot.
+- [hold it in your palm]
+- This is the Solo Stove Lite. Smallest one they make.
+- Nine ounces. Fits right in your bag.
+- You don't need propane or fuel canisters,
+- you just throw some sticks in and light it.
+- Boil water, coffee, ramen, whatever.
+- It's on a crazy Black Friday sale right now.
+- Link's below.
+
+_Same mechanic as your Retro size hook._
+
+**S4** · Nov 27 (orange) · Hook: "Got wood?" · Film: outside, holding sticks · For: guys
+
+- Got wood?
+- [hold up a handful of sticks]
+- Then you've got a fire.
+- Stick it in…
+- [drop them in, light it]
+- and that's it.
+- This is the Solo Stove Lite. Nine ounces, stainless steel,
+- and it runs on sticks, so you never have to buy fuel.
+- Camping, hiking, or when the power goes out.
+- It's on a crazy Black Friday sale right now.
+- Perfect gift for him. Link's below.
+
+_Double meaning, then straight to the demo._
+
+**S5** · Nov 27 (orange) · Hook: "The man who says he doesn't want anything…" · Film: in the car · For: wives/girlfriends buying for him
+
+- If he says he doesn't want anything for Christmas…
+- get him this.
+- [show the stove]
+- Solo Stove Lite. The smallest one they make.
+- Every guy who camps, hunts, fishes, or hikes is gonna want one.
+- It's only nine ounces, and it runs on sticks,
+- so he never has to buy propane.
+- It's on a crazy Black Friday sale right now,
+- so you're gonna look like you spent way more than you did.
+- Link's below.
+
+_Speaks to the buyer, not the user. Gift season._
+
+**S6** · Nov 27 (orange) · Hook: "If the power goes out this winter…" · Film: in the car · For: preppers and parents
+
+- If the power goes out this winter,
+- this is how I'm making coffee.
+- [show the stove]
+- Solo Stove Lite. It runs on sticks,
+- so no propane, no fuel, no power needed.
+- Nine ounces, it lives in my trunk.
+- Boil water, heat up food, whatever you need.
+- Outside only.
+- It's the smallest Solo Stove they make, and it's on a crazy Black Friday sale.
+- This is one of those things you want before you need it.
+- Link's below.
+
+_Emergency angle. Only a few small creators tag #poweroutages, none film it from the car._
+
+**S7** · Nov 27 (orange) · Hook: "Watch how fast this gets going" · Film: OUTSIDE when the rain stops · For: everybody
+
+- Watch how fast this gets going.
+- [light it, hold on the flame for 2–3 seconds]
+- Just sticks. That's it.
+- This is the Solo Stove Lite.
+- It burns so hot it barely smokes.
+- [pick it up by the bottom edge only if it's cool enough, or point at it]
+- Nine ounces, stainless steel, and you never buy fuel.
+- Camping, the backyard, or when the power goes out.
+- It's on a crazy Black Friday sale right now.
+- Link's below.
+
+_Demo version. Let the fire do the talking._
+
+**S8** · Nov 27 (orange) · Hook: "It's pouring and I'm still making a fire" · Film: outside, under a carport or porch roof · For: everybody
+
+- It's pouring outside…
+- and I'm still making a fire.
+- [light it, show the flame with rain in the background]
+- This is the Solo Stove Lite.
+- Nine ounces, runs on sticks,
+- no propane, no fuel canisters.
+- Now I've got hot water for coffee in the rain.
+- It's the smallest Solo Stove they make,
+- and it's on a crazy Black Friday sale.
+- Link's below.
+
+_ONLY film this if it really lights in the rain. Never under the trunk hatch._
 
 ## Kodak Mini 2 Retro ($8/sale)
 

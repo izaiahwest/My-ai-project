@@ -26,8 +26,21 @@ for s in d:
         cls, f, badge = 'proven', 'proven', '<span class="badge b-proven">PROVEN · 5.5M</span>'
     else:
         dt = s['added']; cls, f, badge = f'c-{color[dt]}', dt, f'<span class="badge">{label(dt)}</span>'
-    out.append(f'<article class="card {cls}" data-f="{f}"><div class="top"><span class="id">{s["id"]}</span>{badge}</div>'
+    done = f'<button class="done" type="button" data-id="{s["id"]}" aria-pressed="false">Done</button>'
+    out.append(f'<article class="card {cls}" id="{s["id"]}" data-f="{f}"><div class="top"><span class="id">{s["id"]}</span><span class="right">{badge}{done}</span></div>'
                f'<p class="who">{e(s["who"])}</p><ol>{lis}</ol><p class="from">{e(s["from"])} · {words} words</p></article>')
+
+# Today's filming list (scripts/plan.json): links to each card, with its own Done state.
+plan_html = ''
+if os.path.exists('scripts/plan.json'):
+    pl = json.load(open('scripts/plan.json')); byid = {s['id']: s for s in d}
+    def rows(ids):
+        return ''.join(f'<li data-id="{i}"><a href="#{i}"><b>{i}</b> · {e(byid[i]["p"])} · {e(byid[i]["who"].split(" · ")[0].replace("Hook: ", ""))}</a></li>'
+                       for i in ids if i in byid)
+    plan_html = (f'<section class="plan"><h2>{e(pl["title"])}</h2><p class="from">{e(pl.get("note", ""))}</p>'
+                 f'<ol>{rows(pl["items"])}</ol>'
+                 + (f'<h3>{e(pl["bonus_title"])}</h3><ol>{rows(pl["bonus"])}</ol>' if pl.get('bonus') else '')
+                 + '<p class="count" id="count"></p></section>')
 
 CSS = """
 /* One column, phone first. Each batch date has its own card color; tabs filter by date. */
@@ -58,8 +71,21 @@ h2{font-family:var(--display);font-size:1.2rem;margin:18px 0 0;display:flex;gap:
 .b-proven{color:var(--act)}
 .who{margin:6px 0 8px;font-weight:600}
 ol{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:4px}
-li.act{color:var(--act);font-style:italic;list-style:none;margin-left:-1.4em}
+article ol{list-style:none;counter-reset:ln}
+article li:not(.act){counter-increment:ln}
+article li:not(.act)::before{content:counter(ln) ". ";position:absolute;margin-left:-1.4em;color:var(--muted);font-variant-numeric:tabular-nums}
+li.act{color:var(--act);font-style:italic;margin-left:-1.4em}
 .from{margin:10px 0 0;font-size:.8rem;color:var(--muted)}
+.right{display:flex;gap:8px;align-items:center}
+.done{font:600 .85rem var(--body);color:var(--fg);background:var(--card);border:1.5px solid var(--fg);border-radius:8px;padding:6px 12px;cursor:pointer;min-height:34px}
+.done:focus-visible{outline:2px solid var(--act);outline-offset:2px}
+.card.is-done{filter:grayscale(1);opacity:.45}
+.card.is-done .done{background:var(--fg);color:var(--bg)}
+.plan{background:var(--card);border:2px solid var(--fg);border-radius:10px;padding:4px 16px 14px}
+.plan h2{margin-top:10px}.plan h3{font-family:var(--display);font-size:1rem;margin:14px 0 6px}
+.plan ol{gap:6px}.plan a{color:var(--fg);text-decoration:none}.plan a b{text-decoration:underline}
+.plan li.is-done{opacity:.4;text-decoration:line-through}
+.count{margin:10px 0 0;font-weight:600}
 """
 for c in COLORS:
     CSS += f".c-{c}{{background:var(--{c});border:2px solid var(--{c}-e)}}.c-{c} .badge{{border-color:var(--{c}-e)}}.k-{c}{{background:var(--{c});border-color:var(--{c}-e)}}.tab.t-{c}{{background:var(--{c})}}.tab.t-{c}.on{{border-color:var(--{c}-e)}}\n"
@@ -81,6 +107,26 @@ tabs.forEach(function(t){t.addEventListener('click',function(){show(t.dataset.f)
 var saved='all';try{saved=localStorage.getItem('bank-tab')||'all';}catch(e){}
 if(!tabs.some(function(t){return t.dataset.f===saved;}))saved='all';
 show(saved);
+var KEY='bank-done',done={};
+try{done=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){}
+var planIds=[].slice.call(document.querySelectorAll('.plan li[data-id]')).map(function(li){return li.dataset.id;});
+function paint(){
+  [].slice.call(document.querySelectorAll('.done')).forEach(function(b){
+    var on=!!done[b.dataset.id]; b.textContent=on?'Done ✓':'Done'; b.setAttribute('aria-pressed',on);
+    var c=b.closest('.card'); if(c)c.classList.toggle('is-done',on);
+  });
+  [].slice.call(document.querySelectorAll('.plan li[data-id]')).forEach(function(li){li.classList.toggle('is-done',!!done[li.dataset.id]);});
+  var n=planIds.filter(function(i){return done[i];}).length, c=document.getElementById('count');
+  if(c)c.textContent=n+' of '+planIds.length+' filmed';
+}
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest('.done'); if(!b)return;
+  if(done[b.dataset.id])delete done[b.dataset.id]; else done[b.dataset.id]=1;
+  try{localStorage.setItem(KEY,JSON.stringify(done));}catch(e){}
+  paint();
+});
+paint();
+[].slice.call(document.querySelectorAll('.plan a')).forEach(function(a){a.addEventListener('click',function(){show('all');});});
 })();
 </script>"""
 
@@ -90,8 +136,9 @@ page = f"""<title>WestFaveFinds Script Bank</title>
 <style>{CSS}</style>
 <main>
 <h1>WestFaveFinds Script Bank</h1>
-<p class="lede">Your style: double-meaning hook, then a calm walkthrough. Film one, clap, film the next. Green lines are actions. Each day's batch has its own color: {legend}</p>
+<p class="lede">Your style: double-meaning hook, then a calm walkthrough. Film one, clap, film the next. Green lines are actions. Tap Done when you've filmed one (tap again to undo). Each day's batch has its own color: {legend}</p>
 <div class="tabs" role="group" aria-label="Show scripts from">{''.join(tabs)}</div>
+{plan_html}
 {chr(10).join(out)}
 <p class="from">Say "I actually just put it on sale" only when the sale is live. Keep hooks at this level; an explicit version can get the video restricted. Solo Stove: never light it in or right next to the car, and don't pick it up once it's lit. Never film while driving.</p>
 </main>
