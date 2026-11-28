@@ -2,6 +2,57 @@
 
 Each batch is marked with its date. ✅ = proven. [Brackets] = actions.
 
+## Film today · Nov 28 (17 videos + Solo Stove bonus)
+
+**Kodak Dock Plus · film these first ($16 a sale)**
+
+1. K3 · Kodak Dock Plus · Hook: "It goes in and out… four times"
+2. P1 · Kodak Dock Plus · Original
+3. V2 · Kodak Dock Plus · Hook: "Slide it in"
+4. V4 · Kodak Dock Plus · Hook: "Only takes a few seconds"
+5. F4 · Kodak Dock Plus · The picture matches real life
+
+- K3: do a test print first and count the passes.
+- F4: parked only. Take the windshield photo from where the camera sits.
+
+**AI Voice Translator · car**
+
+1. T1 · AI Voice Translator (ZNP Z06) · Hook: "It's small… and it goes both ways"
+2. T2 · AI Voice Translator (ZNP Z06) · Hook: "Stick it on, hit the button, and talk"
+3. T3 · AI Voice Translator (ZNP Z06) · Hook: "Ever wonder what you'd sound like in Japanese?"
+4. T4 · AI Voice Translator (ZNP Z06) · Hook: "I don't speak a word of Spanish… but listen"
+5. T5 · AI Voice Translator (ZNP Z06) · Hook: "If your girlfriend's parents don't speak English…"
+6. T6 · AI Voice Translator (ZNP Z06) · Hook: "Comment your language"
+7. T7 · AI Voice Translator (ZNP Z06) · Hook: "If you work with customers who don't speak English…"
+
+- Say your line, then stop talking so it can speak.
+- Alone? Say the Spanish answer yourself or play it from your phone.
+
+**Crayola Touch Lights · car**
+
+1. C7 · Crayola Mess-Free Touch Lights · Hook: "This is how you win Christmas with a toddler"
+2. C8 · Crayola Mess-Free Touch Lights · Hook: "Finger painting… with nothing to clean up"
+3. C9 · Crayola Mess-Free Touch Lights · Hook: "If your toddler hates car rides…"
+4. C10 · Crayola Mess-Free Touch Lights · Hook: "Instead of handing them your phone…"
+5. C11 · Crayola Mess-Free Touch Lights · Hook: "If you've got a sensory kid…"
+
+- Clean hooks only: it's a toddler toy.
+
+**Bonus if you have time · Solo Stove**
+
+1. F1 · Solo Stove Lite · Car to fire
+2. F2 · Solo Stove Lite · Snap and it's done
+3. S1 · Solo Stove Lite · Hook: "Stick it in, light it up"
+4. S2 · Solo Stove Lite · Hook: "I paid fifty dollars for this…"
+5. S6 · Solo Stove Lite · Hook: "If the power goes out this winter…"
+
+- Never light it in or next to the car.
+
+- Clap once between videos.
+- Mess up a line? Say it again. We cut the bad take.
+- Tap Done on a card when it's filmed.
+- AirDrop everything when done. Edits run overnight.
+
 ## Kodak Dock Plus ($16/sale)
 
 **P1** · ✅ proven · Original · 5.5M views
@@ -24,7 +75,7 @@ Each batch is marked with its date. ✅ = proven. [Brackets] = actions.
 
 _Your video, word for word. Re-post it in new spots (different car angle, a room at home) any time._
 
-**K1** · Nov 28 (pink) · Hook: "It goes in and out… four times" · Film: car, phone propped close to the printer
+**K3** · Nov 28 (blue) · Hook: "It goes in and out… four times" · Film: car, phone propped close to the printer
 
 - [paper starts going into the printer]
 - It goes in and out…
@@ -85,6 +136,37 @@ _Before filming: take a photo through the windshield from where the camera will 
 - [print 8] Link's below.
 
 _Say a line, swap to the next print, say the next line. We hard-cut between them._
+
+**K1** · Nov 27 · batch 2 (pink) · Hook: "If he never prints a picture of you two…" · Film: HER, basement · For: girlfriends
+
+- If he never prints a single picture of you two…
+- print them yourself.
+- [phone onto the dock]
+- Stick it in, choose a photo, print,
+- and in seconds it's printed straight from your phone.
+- Fully laminated and smudge proof,
+- so they're going on the fridge, the mirror, everywhere.
+- This is the Kodak dock printer. You just download the Kodak app.
+- Comes with 50 sheets of photo paper, and even this adapter if you have an older phone.
+- Honestly one of the best Christmas gifts this year.
+- These are getting super popular, so if you're seeing this, now's your time.
+- Link's below.
+
+_Her opener, then your approved hook word for word._
+
+**K2** · Nov 27 · batch 2 (pink) · Hook: "Every picture on this wall came out of this" · Film: HER, basement wall
+
+- [camera on the wall of prints]
+- Every picture on this wall…
+- [pull back to the printer in her hand]
+- came out of this.
+- Stick it in, choose a photo, print, and in seconds you've got a real photo.
+- Fully laminated and smudge proof, so you can tape them up anywhere.
+- This is the Kodak dock printer. You just download the Kodak app.
+- Comes with 50 sheets of photo paper, so you can do a whole wall.
+- Best Christmas gift this year. Link's below.
+
+_Before filming: print about 12 photos and tape them to the wall. Start on the wall, then pull back to the printer._
 
 **V1** · Nov 24 (yellow) · Hook: "Shove it in" · For: moms
 
@@ -233,7 +315,7 @@ _Your structure; who-it's-for line changed._
 
 ## AI Voice Translator (ZNP Z06) ($3.60/sale)
 
-**T1** · Nov 28 (pink) · Hook: "It's small… and it goes both ways" · Film: car
+**T1** · Nov 28 (blue) · Hook: "It's small… and it goes both ways" · Film: car
 
 - [hold it up to the lens]
 - It's small…
@@ -255,7 +337,7 @@ _Your structure; who-it's-for line changed._
 
 _Your double-meaning style. Literal too: it's two-way._
 
-**T2** · Nov 28 (pink) · Hook: "Stick it on, hit the button, and talk" · Film: car
+**T2** · Nov 28 (blue) · Hook: "Stick it on, hit the button, and talk" · Film: car
 
 - [stick it on the back of your phone]
 - Stick it on, hit the button, and talk.
@@ -272,7 +354,7 @@ _Your double-meaning style. Literal too: it's two-way._
 
 _Same rhythm as your 5.5M hook._
 
-**T3** · Nov 28 (pink) · Hook: "Ever wonder what you'd sound like in Japanese?" · Film: car
+**T3** · Nov 28 (blue) · Hook: "Ever wonder what you'd sound like in Japanese?" · Film: car
 
 - Ever wonder what you'd sound like in Japanese?
 - [say:] What's up y'all, I hope you're having a good day.
@@ -287,7 +369,7 @@ _Same rhythm as your 5.5M hook._
 
 _Built from the top sellers for this product (see swipes, Nov 28)._
 
-**T4** · Nov 28 (pink) · Hook: "I don't speak a word of Spanish… but listen" · Film: car
+**T4** · Nov 28 (blue) · Hook: "I don't speak a word of Spanish… but listen" · Film: car
 
 - I don't speak a word of Spanish…
 - but listen.
@@ -303,7 +385,7 @@ _Built from the top sellers for this product (see swipes, Nov 28)._
 
 _Built from the top sellers for this product (see swipes, Nov 28)._
 
-**T5** · Nov 28 (pink) · Hook: "If your girlfriend's parents don't speak English…" · Film: car
+**T5** · Nov 28 (blue) · Hook: "If your girlfriend's parents don't speak English…" · Film: car
 
 - If your girlfriend's parents don't speak English…
 - this is how you finally get them to like you.
@@ -319,7 +401,7 @@ _Built from the top sellers for this product (see swipes, Nov 28)._
 
 _Built from the top sellers for this product (see swipes, Nov 28)._
 
-**T6** · Nov 28 (pink) · Hook: "Comment your language" · Film: car
+**T6** · Nov 28 (blue) · Hook: "Comment your language" · Film: car
 
 - Comment your language,
 - and I'll make this say something in it, in my voice.
@@ -336,7 +418,7 @@ _Built from the top sellers for this product (see swipes, Nov 28)._
 
 _Every comment can become its own "Replying to @…" video, so this one turns into a whole series._
 
-**T7** · Nov 28 (pink) · Hook: "If you work with customers who don't speak English…" · Film: car
+**T7** · Nov 28 (blue) · Hook: "If you work with customers who don't speak English…" · Film: car
 
 - If you work with customers who don't speak English,
 - nurses, contractors, drive-thru, retail,
@@ -355,7 +437,36 @@ _Chase's best seller (858 sold) is the medical-worker version. This widens it to
 
 ## Crayola Mess-Free Touch Lights ($2.05/sale)
 
-**C1** · Nov 28 (pink) · Hook: "This is how you win Christmas with a toddler" · Film: car
+**C10** · Nov 28 (blue) · Hook: "Instead of handing them your phone…" · Film: car
+
+- Instead of handing your toddler your phone…
+- [hold it up]
+- hand them this.
+- It's the Crayola Mess-Free Touch Lights.
+- No screen. They draw with their finger, and the gel lights up.
+- [draw on it]
+- Flip the switch, and they've got music while they draw.
+- Totally mess-free, and it goes back to blank.
+- It keeps them busy, and it's not YouTube.
+- Great Christmas gift. Link's below.
+
+_Built from the top sellers for this product (see swipes, Nov 28)._
+
+**C11** · Nov 28 (blue) · Hook: "If you've got a sensory kid…" · Film: car
+
+- If you're shopping for a sensory kid,
+- you're gonna want to see this.
+- [press into the gel so it lights up]
+- It's squishy gel, and it lights up wherever they touch.
+- This is the Crayola Mess-Free Touch Lights.
+- Different colors, a music mode,
+- and it goes back to blank so they can keep going.
+- No mess at all.
+- These are going fast for Christmas. Link's below.
+
+_Built from the top sellers for this product (see swipes, Nov 28)._
+
+**C7** · Nov 28 (blue) · Hook: "This is how you win Christmas with a toddler" · Film: car
 
 - If you've got a toddler on your list,
 - this is how you win Christmas.
@@ -371,7 +482,7 @@ _Chase's best seller (858 sold) is the medical-worker version. This widens it to
 
 _Built from the top sellers for this product (see swipes, Nov 28)._
 
-**C2** · Nov 28 (pink) · Hook: "Finger painting… with nothing to clean up" · Film: car
+**C8** · Nov 28 (blue) · Hook: "Finger painting… with nothing to clean up" · Film: car
 
 - Finger painting…
 - [draw on it, it lights up]
@@ -385,7 +496,7 @@ _Built from the top sellers for this product (see swipes, Nov 28)._
 
 _Built from the top sellers for this product (see swipes, Nov 28)._
 
-**C3** · Nov 28 (pink) · Hook: "If your toddler hates car rides…" · Film: car
+**C9** · Nov 28 (blue) · Hook: "If your toddler hates car rides…" · Film: car
 
 - If your toddler hates car rides…
 - [hold it up in the back seat]
@@ -400,34 +511,89 @@ _Built from the top sellers for this product (see swipes, Nov 28)._
 
 _You're already in the car, so nobody else can film this one as easily._
 
-**C4** · Nov 28 (pink) · Hook: "Instead of handing them your phone…" · Film: car
+**C1** · Nov 27 · batch 2 (pink) · Hook: "No markers. No paint. No mess." · Film: YOU, parked car · For: parents
 
-- Instead of handing your toddler your phone…
-- [hold it up]
-- hand them this.
-- It's the Crayola Mess-Free Touch Lights.
-- No screen. They draw with their finger, and the gel lights up.
-- [draw on it]
-- Flip the switch, and they've got music while they draw.
-- Totally mess-free, and it goes back to blank.
-- It keeps them busy, and it's not YouTube.
-- Great Christmas gift. Link's below.
+- [hold it up, drag a finger across so it lights up]
+- No markers. No paint. No mess.
+- They just touch it… and it lights up.
+- This is the Crayola Mess-Free Touch Lights, and it's made for toddlers.
+- [draw a smiley face]
+- Every line they draw lights up,
+- so nothing ends up on your walls, your couch, or your car seats.
+- Perfect for road trips, restaurants, or when you just need five minutes.
+- I already know it's gonna be one of the best gifts for little kids this year.
+- These are getting super popular, so if you're seeing this, now's your time.
+- I'll leave the link below.
 
-_Built from the top sellers for this product (see swipes, Nov 28)._
+_Clean hook on purpose: no double meanings on a kids' toy._
 
-**C5** · Nov 28 (pink) · Hook: "If you've got a sensory kid…" · Film: car
+**C2** · Nov 27 · batch 2 (pink) · Hook: "If you don't know what to get a toddler…" · Film: YOU, parked car · For: aunts, uncles, last-minute buyers
 
-- If you're shopping for a sensory kid,
-- you're gonna want to see this.
-- [press into the gel so it lights up]
-- It's squishy gel, and it lights up wherever they touch.
+- If you don't know what to get a toddler for Christmas…
+- get them this.
+- [drag a finger, it lights up]
 - This is the Crayola Mess-Free Touch Lights.
-- Different colors, a music mode,
-- and it goes back to blank so they can keep going.
-- No mess at all.
-- These are going fast for Christmas. Link's below.
+- They just touch it and it lights up. No markers, no paint, nothing to clean.
+- And it's Crayola, so you know they're gonna love it.
+- If you're the uncle or the aunt who never knows what to buy, this is the move.
+- One of the best gifts for little kids this year.
+- These are getting super popular, so now's your time. Link's below.
 
-_Built from the top sellers for this product (see swipes, Nov 28)._
+_Speaks to the buyer, same move as Solo Stove S5._
+
+**C3** · Nov 27 · batch 2 (pink) · A new drawing every line · Film: YOU, parked car
+
+- [drawing 1: one glowing line] Touch it, and it lights up.
+- [drawing 2: smiley] No markers, no paint, no mess.
+- [drawing 3: heart] This is the Crayola Mess-Free Touch Lights.
+- [drawing 4: star] It's made for toddlers.
+- [drawing 5: a letter] Perfect for the car, nothing gets on the seats.
+- [drawing 6: Christmas tree] Best gift for little kids this year.
+- [drawing 7: arrow pointing down] Link's below.
+
+_Same idea as Kodak F5. Draw something new, say the line, draw the next thing. We hard-cut between them._
+
+**C4** · Nov 27 · batch 2 (pink) · Hook: "Turn the lights off and watch this" · Film: HER, basement, lights off
+
+- [lights on, board on the table]
+- Turn the lights off…
+- [flip the lights off]
+- and watch this.
+- [draw slowly so the lines glow]
+- This is the Crayola Mess-Free Touch Lights.
+- You just draw with your finger, and it lights up.
+- No markers, no paint, no mess on anything.
+- It's made for toddlers, but honestly I can't stop playing with it.
+- If you have a little one on your list this year, this is the gift.
+- These are getting super popular, so grab one now. Link's below.
+
+_The dark makes the lines pop. Phone on a stand, board flat, her hand in frame._
+
+**C5** · Nov 27 · batch 2 (pink) · Hook: "I bought this for a toddler and now I can't put it down" · Film: HER, basement, lamp on
+
+- I bought this for a toddler…
+- and now I can't put it down.
+- [draw, it lights up]
+- This is the Crayola Mess-Free Touch Lights.
+- They just touch it and it lights up, so there's no markers and no paint to clean up.
+- If you're done scrubbing crayon off the walls, this is for you.
+- It's made for toddlers, and it's Crayola, so you know it's good.
+- One of the best gifts for little kids this year.
+- Link's below.
+
+_Talking head, board in hand._
+
+**C6** · Nov 27 · batch 2 (pink) · Hook: "The most satisfying toy I've seen this year" · Film: HER, basement, lights off, close-up
+
+- [lights off, slow finger swirl]
+- This is the most satisfying toy I've seen this year.
+- [keep drawing, no talking for 2 seconds]
+- Crayola Mess-Free Touch Lights.
+- Made for toddlers. No markers, no paint, no mess.
+- Just touch it, and it lights up.
+- Perfect gift for the little ones. Link's below.
+
+_Short and slow. Let the glow carry it. 2 seconds of no talking is fine._
 
 ## Solo Stove Lite ($3/sale)
 
@@ -596,6 +762,21 @@ _Demo version. Let the fire do the talking._
 - Link's below.
 
 _ONLY film this if it really lights in the rain. Never under the trunk hatch._
+
+**SG** · Nov 27 · batch 2 (pink) · Hook: "If your man says he doesn't want anything…" · Film: HER, basement · UNLIT ONLY
+
+- If your man says he doesn't want anything for Christmas…
+- get him this.
+- [hold up the stove]
+- This is the Solo Stove Lite, the smallest one they make.
+- If he camps, hunts, fishes, or hikes, he's gonna want one.
+- It's only nine ounces, and it runs on sticks,
+- so he never has to buy propane.
+- It's on a crazy Black Friday sale right now,
+- so you're gonna look like you spent way more than you did.
+- Link's below.
+
+_S5 in her voice. Hold it unlit. Never light it indoors._
 
 ## Kodak Mini 2 Retro ($8/sale)
 

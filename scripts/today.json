@@ -1,0 +1,68 @@
+{
+ "date": "2026-11-28",
+ "goal": "17 videos + Solo Stove bonus",
+ "groups": [
+  {
+   "who": "Kodak Dock Plus · film these first ($16 a sale)",
+   "ids": [
+    "K3",
+    "P1",
+    "V2",
+    "V4",
+    "F4"
+   ],
+   "tips": [
+    "K3: do a test print first and count the passes.",
+    "F4: parked only. Take the windshield photo from where the camera sits."
+   ]
+  },
+  {
+   "who": "AI Voice Translator · car",
+   "ids": [
+    "T1",
+    "T2",
+    "T3",
+    "T4",
+    "T5",
+    "T6",
+    "T7"
+   ],
+   "tips": [
+    "Say your line, then stop talking so it can speak.",
+    "Alone? Say the Spanish answer yourself or play it from your phone."
+   ]
+  },
+  {
+   "who": "Crayola Touch Lights · car",
+   "ids": [
+    "C7",
+    "C8",
+    "C9",
+    "C10",
+    "C11"
+   ],
+   "tips": [
+    "Clean hooks only: it's a toddler toy."
+   ]
+  },
+  {
+   "who": "Bonus if you have time · Solo Stove",
+   "ids": [
+    "F1",
+    "F2",
+    "S1",
+    "S2",
+    "S6"
+   ],
+   "tips": [
+    "Never light it in or next to the car."
+   ]
+  }
+ ],
+ "rules": [
+  "Clap once between videos.",
+  "Mess up a line? Say it again. We cut the bad take.",
+  "Tap Done on a card when it's filmed.",
+  "AirDrop everything when done. Edits run overnight."
+ ]
+}
